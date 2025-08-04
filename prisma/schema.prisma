@@ -15,7 +15,7 @@ enum Role {
 // Representa quem usa o sistema: administrador ou vendedor.
 model User {
   id        String    @id @default(uuid())
-  name      String
+  name      String    @unique
   password  String
   role      Role      @default(VENDOR)
   createdAt DateTime  @default(now())
@@ -54,6 +54,7 @@ model DailyProduct {
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   sales      Sale[]
+
   @@unique([productId, eventDayId])
 }
 

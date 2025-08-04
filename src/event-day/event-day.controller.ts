@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
-import { EventRepository } from "./event-day.repository";
+import { EventDayRepository } from "./event-day.repository";
 
 @Controller("/event-days")
 export class EventDayController {
-  constructor(private eventDayRepository: EventRepository) {}
+  constructor(private eventDayRepository: EventDayRepository) {}
 
   @Get()
   async getAllEvents() {

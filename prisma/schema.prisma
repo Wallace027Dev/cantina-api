@@ -54,17 +54,16 @@ model DailyProduct {
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   sales      Sale[]
-
   @@unique([productId, eventDayId])
 }
 
 // Venda feita por um vendedor, de um DailyProduct.
 model Sale {
   id             String       @id @default(uuid())
-  user           User         @relation(fields: [userId], references: [id])
   userId         String
-  dailyProduct   DailyProduct @relation(fields: [dailyProductId], references: [id])
   dailyProductId String
   quantitySold   Int
   createdAt      DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id])
+  dailyProduct   DailyProduct @relation(fields: [dailyProductId], references: [id])
 }

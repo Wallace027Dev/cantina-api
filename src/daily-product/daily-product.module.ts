@@ -6,4 +6,4 @@ import { DailyProductRepository } from "./daily-product.repository";
   controllers: [DailyProductController],
   providers: [DailyProductRepository],
 })
-export class SaleModule {}
+export class DailyProductModule {}

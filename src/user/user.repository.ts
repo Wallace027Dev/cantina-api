@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { Injectable } from "@nestjs/common";
-import { CreateUserDTO } from "./dto/CreateUser.dto";
+import { UserEntity } from "./user.entity";
 
 @Injectable()
 export class UserRepository {
-  private usuarios: CreateUserDTO[] = [];
+  private usuarios: UserEntity[] = [];
 
   async list() {
     return this.usuarios;
   }
 
-  async save(user: CreateUserDTO) {
+  async save(user: UserEntity) {
     this.usuarios.push(user);
     console.log(this.usuarios);
     return user;

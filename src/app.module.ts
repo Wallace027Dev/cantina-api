@@ -6,12 +6,12 @@ import { DailyProductModule } from "./daily-product/daily-product.module";
 import { EventDayModule } from "./event-day/event-day.module";
 
 @Module({
-  imports: [
-    UserModule,
-    SaleModule,
-    ProductModule,
-    DailyProductModule,
-    EventDayModule,
-  ],
+	imports: [
+		UserModule,
+		SaleModule,
+		ProductModule,
+		DailyProductModule,
+		EventDayModule,
+	],
 })
 export class AppModule {}

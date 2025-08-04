@@ -1,10 +1,10 @@
 import { SaleEntity } from "src/sale/sale.entity";
 
-export class UserEntity {
+export class DailyProductEntity {
 	id: string;
-	name: string;
-	password: string;
-	role: "admin" | "employee";
+	productId: string;
+	eventDayId: string;
+	quantity: number;
 	sales: SaleEntity[];
 	createdAt: Date;
 	updatedAt?: Date | null;

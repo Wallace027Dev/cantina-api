@@ -4,21 +4,21 @@ import { UserEntity } from "./user.entity";
 
 @Injectable()
 export class UserRepository {
-  private usuarios: UserEntity[] = [];
+	private usuarios: UserEntity[] = [];
 
-  async list() {
-    return this.usuarios;
-  }
+	async list() {
+		return this.usuarios;
+	}
 
-  async save(user: UserEntity) {
-    this.usuarios.push(user);
-    console.log(this.usuarios);
-    return user;
-  }
+	async save(user: UserEntity) {
+		this.usuarios.push(user);
+		console.log(this.usuarios);
+		return user;
+	}
 
-  async existName(name: string) {
-    const possibleUser = this.usuarios.find((user) => user.name === name);
+	async existName(name: string) {
+		const possibleUser = this.usuarios.find((user) => user.name === name);
 
-    return !!possibleUser;
-  }
+		return !!possibleUser;
+	}
 }

@@ -1,22 +1,18 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { Injectable } from "@nestjs/common";
+import { EventDayEntity } from "./event-day.entity";
 
 @Injectable()
 export class EventDayRepository {
-  private events: {
-    date: Date;
-    products: { name: string; price: number }[];
-  }[] = [];
+	private events: EventDayEntity[] = [];
 
-  async list() {
-    return this.events;
-  }
+	async list() {
+		return this.events;
+	}
 
-  async create(event: {
-    date: Date;
-    products: { name: string; price: number }[];
-  }) {
-    this.events.push(event);
-    console.log(this.events);
-    return event;
-  }
+	async create(eventDay: EventDayEntity) {
+		this.events.push(eventDay);
+		console.log(this.events);
+		return eventDay;
+	}
 }

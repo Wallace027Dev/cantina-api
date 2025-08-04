@@ -7,30 +7,50 @@ import { listUserDTO } from "./dto/ListUser.dto";
 
 @Controller("/users")
 export class UserController {
-  constructor(private userRepository: UserRepository) {}
+	constructor(private userRepository: UserRepository) {}
 
-  @Get()
-  async getAllUsers() {
-    const usersSaved = await this.userRepository.list();
-    const usersList = usersSaved.map(
-      (user) => new listUserDTO(user.id, user.name),
-    );
-    return usersList;
-  }
+	@Get()
+	async getAllUsers() {
+		const usersSaved = await this.userRepository.list();
+		const usersList = usersSaved.map(
+			(user) =>
+				new listUserDTO(
+					user.id,
+					user.name,
+					user.role,
+					user.sales,
+					user.createdAt,
+					user.updatedAt,
+					user.deletedAt,
+				),
+		);
+		return usersList;
+	}
 
-  @Post()
-  async createUser(@Body() userData: CreateUserDTO) {
-    const userEntity = new UserEntity();
-    userEntity.name = userData.name;
-    userEntity.password = userData.password;
-    userEntity.role = userData.role;
-    userEntity.id = uuid();
-    userEntity.createdAt = new Date();
+	@Post()
+	async createUser(@Body() userData: CreateUserDTO) {
+		const userEntity = new UserEntity();
+		userEntity.id = uuid();
+		userEntity.name = userData.name;
+		userEntity.password = userData.password;
+		userEntity.role = userData.role;
+		userEntity.sales = [];
+		userEntity.createdAt = new Date();
+		userEntity.updatedAt = null;
+		userEntity.deletedAt = null;
 
-    await this.userRepository.save(userEntity);
-    return {
-      user: new listUserDTO(userEntity.id, userEntity.name),
-      message: "Usuário criado com sucesso",
-    };
-  }
+		await this.userRepository.save(userEntity);
+		return {
+			user: new listUserDTO(
+				userEntity.id,
+				userEntity.name,
+				userEntity.role,
+				userEntity.sales,
+				userEntity.createdAt,
+				userEntity.updatedAt,
+				userEntity.deletedAt,
+			),
+			message: "Usuário criado com sucesso",
+		};
+	}
 }

@@ -45,16 +45,16 @@ model Product {
 // Produto disponível em um dia específico, com quantidade definida.
 model DailyProduct {
   id         String    @id @default(uuid())
-  product    Product   @relation(fields: [productId], references: [id])
   productId  String
-  day        EventDay  @relation(fields: [eventDayId], references: [id])
   eventDayId String
   quantity   Int
+  sales      Sale[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
-  sales      Sale[]
 
+  product    Product   @relation(fields: [productId], references: [id])
+  day        EventDay  @relation(fields: [eventDayId], references: [id])
   @@unique([productId, eventDayId])
 }
 

@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { EventDayRepository } from "./event-day.repository";
 import { v4 as uuid } from "uuid";
 import { EventDayEntity } from "./event-day.entity";
 import { CreateEventDayDTO } from "./dto/CreateEventDay.dto";
 import { DailyProductEntity } from "src/daily-product/daily-product.entity";
 import { DailyProductRepository } from "src/daily-product/daily-product.repository";
+import { UpdateEventDayDTO } from "./dto/UpdateEventDay.dto";
 
 @Controller("/event-days")
 export class EventDayController {
@@ -55,6 +56,15 @@ export class EventDayController {
 		return {
 			product: eventEntity,
 			message: "Evento criado com sucesso",
+		};
+	}
+
+	@Put("/:id")
+	async updateEvent(@Param("id") id: string, @Body() data: UpdateEventDayDTO) {
+		const updatedEvent = await this.eventDayRepository.update(id, data);
+		return {
+			event: updatedEvent,
+			message: "Evento atualizado com sucesso",
 		};
 	}
 }

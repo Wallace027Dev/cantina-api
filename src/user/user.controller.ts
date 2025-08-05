@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { UserRepository } from "./user.repository";
-import { CreateUserDTO } from "./dto/CreateUser.dto";
-import { UserEntity } from "./user.entity";
 import { v4 as uuid } from "uuid";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import { UserRepository } from "./user.repository";
+import { UserEntity } from "./user.entity";
 import { listUserDTO } from "./dto/ListUser.dto";
+import { UpdateUserDTO } from "./dto/UpdateUser.dto";
+import { CreateUserDTO } from "./dto/CreateUser.dto";
 
 @Controller("/users")
 export class UserController {
@@ -41,6 +42,7 @@ export class UserController {
 
 		await this.userRepository.save(userEntity);
 		return {
+			message: "Usuário criado com sucesso",
 			user: new listUserDTO(
 				userEntity.id,
 				userEntity.name,
@@ -50,7 +52,24 @@ export class UserController {
 				userEntity.updatedAt,
 				userEntity.deletedAt,
 			),
-			message: "Usuário criado com sucesso",
+		};
+	}
+
+	@Put("/:id")
+	async updateUser(@Param("id") id: string, @Body() userData: UpdateUserDTO) {
+		const updatedUser = await this.userRepository.update(id, userData);
+
+		return {
+			message: "Usuário atualizado com sucesso",
+			user: new listUserDTO(
+				updatedUser.id,
+				updatedUser.name,
+				updatedUser.role,
+				updatedUser.sales,
+				updatedUser.createdAt,
+				updatedUser.updatedAt,
+				updatedUser.deletedAt,
+			),
 		};
 	}
 }

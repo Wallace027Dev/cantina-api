@@ -1,6 +1,5 @@
 import { IsNumber, IsUUID } from "class-validator";
 
-// dailyProduct
 export class CreateSaleDTO {
 	@IsUUID("4", { message: "userId precisa ser um UUID v4" })
 	userId: string;

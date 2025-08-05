@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { DailyProductRepository } from "./daily-product.repository";
 import { v4 as uuid } from "uuid";
 import { CreateDailyProductDTO } from "./dto/DailyProduct.dto";
 import { DailyProductEntity } from "./daily-product.entity";
+import { UpdateDailyProductDTO } from "./dto/UpdateDailyProduct.dto";
 
 @Controller("/daily-products")
 export class DailyProductController {
@@ -28,6 +29,18 @@ export class DailyProductController {
 		return {
 			product: dailyProducts,
 			message: "Produto criado com sucesso",
+		};
+	}
+
+	@Put("/:id")
+	async updateDailyProduct(
+		@Param("id") id: string,
+		@Body() data: UpdateDailyProductDTO,
+	) {
+		const updatedProduct = await this.dailyProductRepository.update(id, data);
+		return {
+			product: updatedProduct,
+			message: "Produto atualizado com sucesso",
 		};
 	}
 }

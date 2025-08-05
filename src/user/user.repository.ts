@@ -12,7 +12,6 @@ export class UserRepository {
 
 	async save(user: UserEntity) {
 		this.usuarios.push(user);
-		console.log(this.usuarios);
 		return user;
 	}
 
@@ -20,5 +19,23 @@ export class UserRepository {
 		const possibleUser = this.usuarios.find((user) => user.name === name);
 
 		return !!possibleUser;
+	}
+
+	async update(id: string, dataForUpdate: Partial<UserEntity>) {
+		const possibleUser = this.usuarios.find((user) => user.id === id);
+		if (!possibleUser) throw new Error("Usuário não encontrado.");
+
+		const updatedUser = {
+			id: possibleUser.id,
+			name: dataForUpdate.name ?? possibleUser.name,
+			password: dataForUpdate.password ?? possibleUser.password,
+			role: dataForUpdate.role ?? possibleUser.role,
+			sales: dataForUpdate.sales ?? possibleUser.sales,
+			createdAt: possibleUser.createdAt,
+			updatedAt: new Date(),
+			deletedAt: null,
+		};
+
+		return updatedUser;
 	}
 }

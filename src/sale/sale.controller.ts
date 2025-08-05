@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { SaleRepository } from "./sale.repository";
-import { CreateSaleDTO } from "./dto/CreateSale.dto";
-import { SaleEntity } from "./sale.entity";
 import { v4 as uuid } from "uuid";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import { CreateSaleDTO } from "./dto/CreateSale.dto";
+import { SaleRepository } from "./sale.repository";
+import { SaleEntity } from "./sale.entity";
+import { UpdateSaleDTO } from "./dto/UpdateSale.dto";
 
 @Controller("/sales")
 export class SaleController {
@@ -25,6 +26,15 @@ export class SaleController {
 		return {
 			sale: saleEntity,
 			message: "Venda criada com sucesso",
+		};
+	}
+
+	@Put("/:id")
+	async updateSale(@Param("id") id: string, @Body() data: UpdateSaleDTO) {
+		const updatedSale = await this.saleRepository.update(id, data);
+		return {
+			sale: updatedSale,
+			message: "Venda atualizada com sucesso",
 		};
 	}
 }

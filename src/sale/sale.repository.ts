@@ -12,7 +12,13 @@ export class SaleRepository {
 
 	async save(sale: SaleEntity) {
 		this.sales.push(sale);
-		console.log(this.sales);
 		return sale;
+	}
+
+	async update(id: string, dataForUpdate: Partial<SaleEntity>) {
+		const index = this.sales.findIndex((sale) => sale.id === id);
+		if (index === -1) throw new Error("Venda nao encontrada.");
+		this.sales[index] = { ...this.sales[index], ...dataForUpdate };
+		return this.sales[index];
 	}
 }

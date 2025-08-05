@@ -1,10 +1,10 @@
-import { DailyProductEntity } from "src/daily-product/daily-product.entity";
+import { CreateDailyProductDTO } from "src/daily-product/dto/DailyProduct.dto";
 
 export class ProductEntity {
 	id: string;
 	name: string;
 	price: number;
-	dailyProducts: DailyProductEntity[];
+	dailyProducts: CreateDailyProductDTO[];
 	createdAt: Date;
 	updatedAt?: Date | null;
 	deletedAt?: Date | null;

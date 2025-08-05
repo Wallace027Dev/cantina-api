@@ -21,8 +21,12 @@ export class UserRepository {
 		return !!possibleUser;
 	}
 
+	async findById(id: string) {
+		return this.usuarios.find((user) => user.id === id);
+	}
+
 	async update(id: string, dataForUpdate: Partial<UserEntity>) {
-		const possibleUser = this.usuarios.find((user) => user.id === id);
+		const possibleUser = await this.findById(id);
 		if (!possibleUser) throw new Error("Usuário não encontrado.");
 
 		const updatedUser = {
@@ -37,5 +41,14 @@ export class UserRepository {
 		};
 
 		return updatedUser;
+	}
+
+	async delete(id: string) {
+		const possibleUser = await this.findById(id);
+		if (!possibleUser) throw new Error("Usuário não encontrado.");
+
+		this.usuarios = this.usuarios.filter((user) => user.id !== id);
+
+		return id;
 	}
 }

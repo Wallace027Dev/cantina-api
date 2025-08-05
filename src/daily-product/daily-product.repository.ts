@@ -24,7 +24,6 @@ export class DailyProductRepository {
 
 		if (index === -1) throw new Error("Produto não encontrado.");
 
-		// Atualiza em memória
 		const updatedProduct: DailyProductEntity = {
 			...this.dailyProducts[index],
 			id: this.dailyProducts[index].id,
@@ -39,5 +38,17 @@ export class DailyProductRepository {
 		this.dailyProducts[index] = updatedProduct;
 
 		return updatedProduct;
+	}
+
+	async delete(id: string) {
+		const index = this.dailyProducts.findIndex((product) => product.id === id);
+		if (index === -1) throw new Error("Produto nao encontrado.");
+
+		const deletedProduct = this.dailyProducts[index];
+		this.dailyProducts = this.dailyProducts.filter(
+			(product) => product.id !== id,
+		);
+
+		return deletedProduct;
 	}
 }

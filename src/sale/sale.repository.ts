@@ -21,4 +21,13 @@ export class SaleRepository {
 		this.sales[index] = { ...this.sales[index], ...dataForUpdate };
 		return this.sales[index];
 	}
+
+	async delete(id: string) {
+		const possibleUser = this.sales.find((sale) => sale.id === id);
+		if (!possibleUser) throw new Error("Venda nao encontrada.");
+
+		this.sales = this.sales.filter((sale) => sale.id !== id);
+
+		return id;
+	}
 }

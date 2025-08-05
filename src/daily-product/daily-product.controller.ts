@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+} from "@nestjs/common";
 import { DailyProductRepository } from "./daily-product.repository";
 import { v4 as uuid } from "uuid";
 import { CreateDailyProductDTO } from "./dto/DailyProduct.dto";
@@ -40,6 +48,16 @@ export class DailyProductController {
 		return {
 			product: updatedProduct,
 			message: "Produto atualizado com sucesso",
+		};
+	}
+
+	@Delete("/:id")
+	async deleteDailyProduct(@Param("id") id: string) {
+		const deletedProduct = await this.dailyProductRepository.delete(id);
+
+		return {
+			product: deletedProduct,
+			message: "Produto deletado com sucesso",
 		};
 	}
 }

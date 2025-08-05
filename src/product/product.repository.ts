@@ -20,7 +20,7 @@ export class ProductRepository {
 	}
 
 	async update(id: string, dataForUpdate: Partial<ProductEntity>) {
-		const possibleProduct = this.products.find((product) => product.id === id);
+		const possibleProduct = await this.findById(id);
 		if (!possibleProduct) throw new Error("Produto não encontrado.");
 
 		const updatedProduct = {
@@ -35,5 +35,14 @@ export class ProductRepository {
 		};
 
 		return updatedProduct;
+	}
+
+	async delete(id: string) {
+		const possibleProduct = await this.findById(id);
+		if (!possibleProduct) throw new Error("Produto nao encontrado.");
+
+		this.products = this.products.filter((product) => product.id !== id);
+
+		return id;
 	}
 }

@@ -1,5 +1,13 @@
 import { v4 as uuid } from "uuid";
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+} from "@nestjs/common";
 import { CreateSaleDTO } from "./dto/CreateSale.dto";
 import { SaleRepository } from "./sale.repository";
 import { SaleEntity } from "./sale.entity";
@@ -35,6 +43,15 @@ export class SaleController {
 		return {
 			sale: updatedSale,
 			message: "Venda atualizada com sucesso",
+		};
+	}
+
+	@Delete("/:id")
+	async deleteSale(@Param("id") id: string) {
+		const removedSale = await this.saleRepository.delete(id);
+		return {
+			sale: removedSale,
+			message: "Venda deletada com sucesso",
 		};
 	}
 }

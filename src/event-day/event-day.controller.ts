@@ -1,5 +1,13 @@
 import { ProductRepository } from "./../product/product.repository";
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+} from "@nestjs/common";
 import { EventDayRepository } from "./event-day.repository";
 import { v4 as uuid } from "uuid";
 import { EventDayEntity } from "./event-day.entity";
@@ -73,6 +81,16 @@ export class EventDayController {
 		return {
 			event: updatedEvent,
 			message: "Evento atualizado com sucesso",
+		};
+	}
+
+	@Delete("/:id")
+	async deleteEvent(@Param("id") id: string) {
+		const removedEvent = await this.eventDayRepository.delete(id);
+
+		return {
+			event: removedEvent,
+			message: "Evento deletado com sucesso",
 		};
 	}
 }

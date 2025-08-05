@@ -38,6 +38,9 @@ export class EventDayController {
 		eventEntity.date = event.date;
 		eventEntity.products = [];
 
+		// Salva o EventDay primeiro
+		await this.eventDayService.createEventDay(eventEntity);
+
 		// verifica se o produto existe
 		for (const p of event.products) {
 			const product = await this.productService.getProductById(p.productId);

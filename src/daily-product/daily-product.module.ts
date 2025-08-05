@@ -3,11 +3,12 @@ import { DailyProductController } from "./daily-product.controller";
 import { DailyProductRepository } from "./daily-product.repository";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DailyProductEntity } from "./daily-product.entity";
+import { DailyProductService } from "./daily-product.service";
 
 @Module({
 	imports: [TypeOrmModule.forFeature([DailyProductEntity])],
-	providers: [DailyProductRepository],
+	providers: [DailyProductRepository, DailyProductService],
 	controllers: [DailyProductController],
-	exports: [DailyProductRepository],
+	exports: [DailyProductRepository, DailyProductService],
 })
 export class DailyProductModule {}

@@ -19,7 +19,6 @@ export class DailyProductController {
 		const dailyProducts = new DailyProductEntity();
 		dailyProducts.id = uuid();
 		dailyProducts.productId = dailyProductData.productId;
-		dailyProducts.eventDayId = dailyProductData.eventDayId;
 		dailyProducts.quantity = dailyProductData.quantity;
 		dailyProducts.createdAt = new Date();
 		dailyProducts.updatedAt = null;

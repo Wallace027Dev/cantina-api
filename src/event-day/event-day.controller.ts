@@ -1,3 +1,4 @@
+import { ProductRepository } from "./../product/product.repository";
 import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { EventDayRepository } from "./event-day.repository";
 import { v4 as uuid } from "uuid";
@@ -12,6 +13,7 @@ export class EventDayController {
 	constructor(
 		private eventDayRepository: EventDayRepository,
 		private dailyProductRepository: DailyProductRepository,
+		private productRepository: ProductRepository,
 	) {}
 
 	@Get()
@@ -26,6 +28,12 @@ export class EventDayController {
 		eventEntity.id = uuid();
 		eventEntity.date = event.date;
 		eventEntity.products = [];
+
+		// verifica se o produto existe
+		for (const p of event.products) {
+			const product = await this.productRepository.findById(p.productId);
+			if (!product) throw new Error("Produto não encontrado.");
+		}
 
 		// montar o DailyProducts
 		const dailyProducts: DailyProductEntity[] = event.products.map((p) => {

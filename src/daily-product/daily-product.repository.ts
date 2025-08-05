@@ -10,6 +10,10 @@ export class DailyProductRepository {
 		return this.dailyProducts;
 	}
 
+	async findById(id: string) {
+		return this.dailyProducts.find((product) => product.id === id);
+	}
+
 	async create(product: DailyProductEntity) {
 		this.dailyProducts.push(product);
 		return product;

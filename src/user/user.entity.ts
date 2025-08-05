@@ -1,12 +1,37 @@
 import { SaleEntity } from "src/sale/sale.entity";
+import {
+	Entity,
+	Column,
+	CreateDateColumn,
+	UpdateDateColumn,
+	DeleteDateColumn,
+	PrimaryGeneratedColumn,
+	OneToMany,
+} from "typeorm";
 
+@Entity({ name: "users" })
 export class UserEntity {
+	@PrimaryGeneratedColumn("uuid")
 	id: string;
+
+	@Column({ unique: true })
 	name: string;
+
+	@Column()
 	password: string;
-	role: "admin" | "employee";
+
+	@Column({ default: "VENDOR" })
+	role: "ADMIN" | "VENDOR";
+
+	@OneToMany(() => SaleEntity, (sale) => sale.user)
 	sales: SaleEntity[];
+
+	@CreateDateColumn()
 	createdAt: Date;
-	updatedAt?: Date | null;
-	deletedAt?: Date | null;
+
+	@UpdateDateColumn()
+	updatedAt?: Date;
+
+	@DeleteDateColumn()
+	deletedAt?: Date;
 }

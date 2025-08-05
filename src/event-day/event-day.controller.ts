@@ -59,7 +59,7 @@ export class EventDayController {
 
 		// salva cada um (pode ser paralelo se quiser)
 		for (const dp of dailyProducts) {
-			await this.dailyProductRepository.create(dp);
+			await this.dailyProductRepository.save(dp);
 		}
 
 		// anexar ao eventEntity pra resposta
@@ -68,7 +68,7 @@ export class EventDayController {
 		// Salve o EventDay
 		eventEntity.products = dailyProducts;
 
-		await this.eventDayRepository.create(eventEntity);
+		await this.eventDayRepository.save(eventEntity);
 		return {
 			product: eventEntity,
 			message: "Evento criado com sucesso",

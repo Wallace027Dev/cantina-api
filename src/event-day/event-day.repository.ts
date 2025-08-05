@@ -13,7 +13,7 @@ export class EventDayRepository {
 		return this.events.find((e) => e.id === id);
 	}
 
-	async create(eventDay: EventDayEntity) {
+	async save(eventDay: EventDayEntity) {
 		this.events.push(eventDay);
 		return eventDay;
 	}

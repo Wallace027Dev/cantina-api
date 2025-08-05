@@ -32,7 +32,7 @@ export class DailyProductController {
 		dailyProducts.updatedAt = null;
 		dailyProducts.deletedAt = null;
 
-		await this.dailyProductRepository.create(dailyProducts);
+		await this.dailyProductRepository.save(dailyProducts);
 		return {
 			product: dailyProducts,
 			message: "Produto criado com sucesso",

@@ -25,7 +25,7 @@ export class ProductController {
 		productEntity.updatedAt = null;
 		productEntity.deletedAt = null;
 
-		await this.productRepository.create(productEntity);
+		await this.productRepository.save(productEntity);
 		return {
 			product: productEntity,
 			message: "Produto criado com sucesso",

@@ -14,7 +14,7 @@ export class ProductRepository {
 		return this.products.find((product) => product.id === id);
 	}
 
-	async create(product: ProductEntity) {
+	async save(product: ProductEntity) {
 		this.products.push(product);
 		return product;
 	}

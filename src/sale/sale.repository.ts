@@ -15,15 +15,28 @@ export class SaleRepository {
 		return sale;
 	}
 
+	async findById(id: string) {
+		return this.sales.find((sale) => sale.id === id);
+	}
+
 	async update(id: string, dataForUpdate: Partial<SaleEntity>) {
-		const index = this.sales.findIndex((sale) => sale.id === id);
-		if (index === -1) throw new Error("Venda nao encontrada.");
-		this.sales[index] = { ...this.sales[index], ...dataForUpdate };
-		return this.sales[index];
+		const existingSale = await this.findById(id);
+		if (!existingSale) throw new Error("Venda não encontrada.");
+
+		const updatedSale: SaleEntity = {
+			id: existingSale.id,
+			userId: dataForUpdate.userId ?? existingSale.userId,
+			dailyProductId:
+				dataForUpdate.dailyProductId ?? existingSale.dailyProductId,
+			quantitySold: dataForUpdate.quantitySold ?? existingSale.quantitySold,
+			createdAt: existingSale.createdAt,
+		};
+
+		return updatedSale;
 	}
 
 	async delete(id: string) {
-		const possibleUser = this.sales.find((sale) => sale.id === id);
+		const possibleUser = await this.findById(id);
 		if (!possibleUser) throw new Error("Venda nao encontrada.");
 
 		this.sales = this.sales.filter((sale) => sale.id !== id);

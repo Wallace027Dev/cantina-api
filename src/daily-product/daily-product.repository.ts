@@ -25,8 +25,8 @@ export class DailyProductRepository {
 
 		const updatedProduct: DailyProductEntity = {
 			id: existingProduct.id,
-			productId: dataForUpdate.productId ?? existingProduct.productId,
-			eventDayId: dataForUpdate.eventDayId ?? existingProduct.eventDayId,
+			product: dataForUpdate.product ?? existingProduct.product,
+			day: dataForUpdate.day ?? existingProduct.day,
 			quantity: dataForUpdate.quantity ?? existingProduct.quantity,
 			sales: dataForUpdate.sales ?? existingProduct.sales,
 			createdAt: existingProduct.createdAt,

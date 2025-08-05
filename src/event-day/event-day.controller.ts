@@ -1,4 +1,4 @@
-import { ProductRepository } from "./../product/product.repository";
+import { ProductService } from "./../product/product.service";
 import {
 	Body,
 	Controller,
@@ -8,25 +8,26 @@ import {
 	Post,
 	Put,
 } from "@nestjs/common";
-import { EventDayRepository } from "./event-day.repository";
+import { EventDayService } from "./event-day.service";
 import { v4 as uuid } from "uuid";
 import { EventDayEntity } from "./event-day.entity";
 import { CreateEventDayDTO } from "./dto/CreateEventDay.dto";
 import { DailyProductEntity } from "src/daily-product/daily-product.entity";
-import { DailyProductRepository } from "src/daily-product/daily-product.repository";
+import { DailyProductService } from "src/daily-product/daily-product.service";
 import { UpdateEventDayDTO } from "./dto/UpdateEventDay.dto";
+import { ProductEntity } from "src/product/product.entity";
 
 @Controller("/event-days")
 export class EventDayController {
 	constructor(
-		private eventDayRepository: EventDayRepository,
-		private dailyProductRepository: DailyProductRepository,
-		private productRepository: ProductRepository,
+		private eventDayService: EventDayService,
+		private dailyProductService: DailyProductService,
+		private productService: ProductService,
 	) {}
 
 	@Get()
 	async getAllEvents() {
-		return await this.eventDayRepository.list();
+		return await this.eventDayService.getAllEventDays();
 	}
 
 	@Post()
@@ -39,7 +40,7 @@ export class EventDayController {
 
 		// verifica se o produto existe
 		for (const p of event.products) {
-			const product = await this.productRepository.findById(p.productId);
+			const product = await this.productService.getProductById(p.productId);
 			if (!product) throw new Error("Produto não encontrado.");
 		}
 
@@ -47,8 +48,10 @@ export class EventDayController {
 		const dailyProducts: DailyProductEntity[] = event.products.map((p) => {
 			const dp = new DailyProductEntity();
 			dp.id = uuid();
-			dp.productId = p.productId;
-			dp.eventDayId = eventEntity.id;
+
+			dp.product = { id: p.productId } as ProductEntity;
+			dp.day = { id: eventEntity.id } as EventDayEntity;
+
 			dp.quantity = p.quantity;
 			dp.createdAt = new Date();
 			dp.updatedAt = null;
@@ -59,7 +62,7 @@ export class EventDayController {
 
 		// salva cada um (pode ser paralelo se quiser)
 		for (const dp of dailyProducts) {
-			await this.dailyProductRepository.save(dp);
+			await this.dailyProductService.createDailyProduct(dp);
 		}
 
 		// anexar ao eventEntity pra resposta
@@ -68,7 +71,7 @@ export class EventDayController {
 		// Salve o EventDay
 		eventEntity.products = dailyProducts;
 
-		await this.eventDayRepository.save(eventEntity);
+		await this.eventDayService.createEventDay(eventEntity);
 		return {
 			product: eventEntity,
 			message: "Evento criado com sucesso",
@@ -77,7 +80,7 @@ export class EventDayController {
 
 	@Put("/:id")
 	async updateEvent(@Param("id") id: string, @Body() data: UpdateEventDayDTO) {
-		const updatedEvent = await this.eventDayRepository.update(id, data);
+		const updatedEvent = await this.eventDayService.updateEventDay(id, data);
 		return {
 			event: updatedEvent,
 			message: "Evento atualizado com sucesso",
@@ -86,7 +89,7 @@ export class EventDayController {
 
 	@Delete("/:id")
 	async deleteEvent(@Param("id") id: string) {
-		const removedEvent = await this.eventDayRepository.delete(id);
+		const removedEvent = await this.eventDayService.deleteEventDay(id);
 
 		return {
 			event: removedEvent,

@@ -1,5 +1,6 @@
 import { IsEnum, MinLength } from "class-validator";
 import { NameIsUnique } from "../validation/name-is-unique.validator";
+import { Role } from "../user.entity";
 
 export class CreateUserDTO {
 	@MinLength(3, { message: "Nome precisa ter pelo menos 3 caracteres" })
@@ -9,8 +10,8 @@ export class CreateUserDTO {
 	@MinLength(6, { message: "Senha precisa ter pelo menos 6 caracteres" })
 	password: string;
 
-	@IsEnum(["employee", "admin"], {
-		message: "Role precisa ser 'employee' ou 'admin'",
+	@IsEnum([Role.ADMIN, Role.VENDOR], {
+		message: "Role precisa ser 'VENDOR' ou 'ADMIN'",
 	})
-	role: "employee" | "admin";
+	role: Role;
 }

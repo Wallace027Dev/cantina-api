@@ -22,12 +22,10 @@ export class SaleRepository {
 	async update(id: string, dataForUpdate: Partial<SaleEntity>) {
 		const existingSale = await this.findById(id);
 		if (!existingSale) throw new Error("Venda não encontrada.");
-
 		const updatedSale: SaleEntity = {
 			id: existingSale.id,
-			userId: dataForUpdate.userId ?? existingSale.userId,
-			dailyProductId:
-				dataForUpdate.dailyProductId ?? existingSale.dailyProductId,
+			user: existingSale.user,
+			dailyProduct: existingSale.dailyProduct,
 			quantitySold: dataForUpdate.quantitySold ?? existingSale.quantitySold,
 			createdAt: existingSale.createdAt,
 		};

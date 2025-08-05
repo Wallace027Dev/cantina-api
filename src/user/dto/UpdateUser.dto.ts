@@ -3,6 +3,7 @@ import { NameIsUnique } from "../validation/name-is-unique.validator";
 import { SaleEntity } from "src/sale/sale.entity";
 import { CreateDailyProductDTO } from "src/daily-product/dto/DailyProduct.dto";
 import { Type } from "class-transformer";
+import { Role } from "../user.entity";
 
 export class UpdateUserDTO {
 	@MinLength(3, { message: "Nome precisa ter pelo menos 3 caracteres" })
@@ -14,11 +15,11 @@ export class UpdateUserDTO {
 	@IsOptional()
 	password: string;
 
-	@IsEnum(["employee", "admin"], {
-		message: "Role precisa ser 'employee' ou 'admin'",
+	@IsEnum([Role.ADMIN, Role.VENDOR], {
+		message: "Role precisa ser 'VENDOR' ou 'ADMIN'",
 	})
 	@IsOptional()
-	role: "employee" | "admin";
+	role: Role;
 
 	@Type(() => CreateDailyProductDTO)
 	@IsOptional()

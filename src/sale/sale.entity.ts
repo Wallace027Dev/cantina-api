@@ -9,22 +9,22 @@ import {
 	PrimaryGeneratedColumn,
 } from "typeorm";
 
-@Entity("sales")
+@Entity({ name: "sales" })
 export class SaleEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@ManyToOne(() => UserEntity, (user) => user.sales)
+	@ManyToOne(() => UserEntity, (user) => user.sales, { nullable: false })
 	@JoinColumn({ name: "user_id" })
 	user: UserEntity;
 
-	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales)
+	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales, { nullable: false })
 	@JoinColumn({ name: "daily_product_id" })
 	dailyProduct: DailyProductEntity;
 
-	@Column({ type: "int" })
+	@Column({ name: "quantity_sold", type: "int", nullable: false })
 	quantitySold: number;
 
-	@CreateDateColumn()
+	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;
 }

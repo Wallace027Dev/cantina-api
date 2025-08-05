@@ -9,29 +9,40 @@ import {
 	OneToMany,
 } from "typeorm";
 
+export enum Role {
+	ADMIN = "ADMIN",
+	VENDOR = "VENDOR",
+}
+
 @Entity({ name: "users" })
 export class UserEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@Column({ unique: true })
+	@Column({
+		name: "name",
+		type: "varchar",
+		length: 100,
+		nullable: false,
+		unique: true,
+	})
 	name: string;
 
-	@Column()
+	@Column({ name: "password", type: "varchar", length: 100, nullable: false })
 	password: string;
 
-	@Column({ default: "VENDOR" })
-	role: "ADMIN" | "VENDOR";
+	@Column({ name: "role", type: "enum", enum: Role, default: Role.VENDOR })
+	role: Role;
 
 	@OneToMany(() => SaleEntity, (sale) => sale.user)
 	sales: SaleEntity[];
 
-	@CreateDateColumn()
+	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;
 
-	@UpdateDateColumn()
-	updatedAt?: Date;
+	@UpdateDateColumn({ name: "updated_at", nullable: true })
+	updatedAt?: Date | null;
 
-	@DeleteDateColumn()
-	deletedAt?: Date;
+	@DeleteDateColumn({ name: "deleted_at", nullable: true })
+	deletedAt?: Date | null;
 }

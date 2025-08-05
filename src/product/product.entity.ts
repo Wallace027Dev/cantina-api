@@ -9,26 +9,32 @@ import {
 	UpdateDateColumn,
 } from "typeorm";
 
-@Entity("products")
+@Entity({ name: "products" })
 export class ProductEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@Column()
+	@Column({ name: "name", length: 100, nullable: false, unique: true })
 	name: string;
 
-	@Column("decimal")
+	@Column({
+		name: "price",
+		type: "decimal",
+		precision: 10,
+		scale: 2,
+		nullable: false,
+	})
 	price: number;
 
 	@OneToMany(() => DailyProductEntity, (dp) => dp.product)
 	dailyProducts: DailyProductEntity[];
 
-	@CreateDateColumn()
+	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;
 
-	@UpdateDateColumn()
-	updatedAt?: Date;
+	@UpdateDateColumn({ name: "updated_at", nullable: true })
+	updatedAt?: Date | null;
 
-	@DeleteDateColumn()
-	deletedAt?: Date;
+	@DeleteDateColumn({ name: "deleted_at", nullable: true })
+	deletedAt?: Date | null;
 }

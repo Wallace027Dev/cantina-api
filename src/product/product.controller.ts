@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
-import { ProductRepository } from "./product.repository";
+import { ProductService } from "./product.service";
 import { CreateProductDTO } from "./dto/CreateProduct.dto";
 import { ProductEntity } from "./product.entity";
 import { v4 as uuid } from "uuid";
@@ -7,11 +7,11 @@ import { UpdateProductDTO } from "./dto/UpdateProduct.dto";
 
 @Controller("/products")
 export class ProductController {
-	constructor(private productRepository: ProductRepository) {}
+	constructor(private productService: ProductService) {}
 
 	@Get()
 	async getAllProducts() {
-		return await this.productRepository.list();
+		return await this.productService.getAllProducts();
 	}
 
 	@Post()
@@ -25,7 +25,7 @@ export class ProductController {
 		productEntity.updatedAt = null;
 		productEntity.deletedAt = null;
 
-		await this.productRepository.save(productEntity);
+		await this.productService.createProduct(productEntity);
 		return {
 			product: productEntity,
 			message: "Produto criado com sucesso",
@@ -37,7 +37,10 @@ export class ProductController {
 		@Param("id") id: string,
 		@Body() productData: UpdateProductDTO,
 	) {
-		const productEntity = await this.productRepository.update(id, productData);
+		const productEntity = await this.productService.updateProduct(
+			id,
+			productData,
+		);
 		return {
 			product: productEntity,
 			message: "Produto atualizado com sucesso",

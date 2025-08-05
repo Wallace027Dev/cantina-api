@@ -6,7 +6,7 @@ export class EventDayEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@Column({ type: "date", unique: true })
+	@Column({ name: "date", type: "date", nullable: false, unique: true })
 	date: Date;
 
 	@OneToMany(() => DailyProductEntity, (dp) => dp.day)

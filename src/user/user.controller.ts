@@ -8,31 +8,19 @@ import {
 	Post,
 	Put,
 } from "@nestjs/common";
-import { UserRepository } from "./user.repository";
 import { UserEntity } from "./user.entity";
 import { listUserDTO } from "./dto/ListUser.dto";
 import { UpdateUserDTO } from "./dto/UpdateUser.dto";
 import { CreateUserDTO } from "./dto/CreateUser.dto";
+import { UserService } from "./user.service";
 
 @Controller("/users")
 export class UserController {
-	constructor(private userRepository: UserRepository) {}
+	constructor(private userService: UserService) {}
 
 	@Get()
 	async getAllUsers() {
-		const usersSaved = await this.userRepository.list();
-		const usersList = usersSaved.map(
-			(user) =>
-				new listUserDTO(
-					user.id,
-					user.name,
-					user.role,
-					user.sales,
-					user.createdAt,
-					user.updatedAt,
-					user.deletedAt,
-				),
-		);
+		const usersList = await this.userService.getAllUsers();
 		return usersList;
 	}
 
@@ -48,7 +36,8 @@ export class UserController {
 		userEntity.updatedAt = null;
 		userEntity.deletedAt = null;
 
-		await this.userRepository.save(userEntity);
+		await this.userService.createUser(userEntity);
+
 		return {
 			message: "Usuário criado com sucesso",
 			user: new listUserDTO(
@@ -65,28 +54,19 @@ export class UserController {
 
 	@Put("/:id")
 	async updateUser(@Param("id") id: string, @Body() userData: UpdateUserDTO) {
-		const updatedUser = await this.userRepository.update(id, userData);
+		await this.userService.updateUser(id, userData);
 
 		return {
 			message: "Usuário atualizado com sucesso",
-			user: new listUserDTO(
-				updatedUser.id,
-				updatedUser.name,
-				updatedUser.role,
-				updatedUser.sales,
-				updatedUser.createdAt,
-				updatedUser.updatedAt,
-				updatedUser.deletedAt,
-			),
 		};
 	}
 
 	@Delete("/:id")
 	async deleteUser(@Param("id") id: string) {
-		const removedUser = await this.userRepository.delete(id);
+		await this.userService.deleteUser(id);
 		return {
 			message: "Usuário deletado com sucesso",
-			user: removedUser,
+			user: id,
 		};
 	}
 }

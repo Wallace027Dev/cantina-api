@@ -6,6 +6,7 @@ import {
 	CreateDateColumn,
 	DeleteDateColumn,
 	Entity,
+	JoinColumn,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
@@ -17,24 +18,28 @@ export class DailyProductEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@ManyToOne(() => ProductEntity, (product) => product.dailyProducts)
+	@ManyToOne(() => ProductEntity, (product) => product.dailyProducts, {
+		nullable: false,
+	})
+	@JoinColumn({ name: "product_id" })
 	product: ProductEntity;
 
-	@ManyToOne(() => EventDayEntity, (day) => day.products)
+	@ManyToOne(() => EventDayEntity, (day) => day.products, { nullable: false })
+	@JoinColumn({ name: "event_day_id" })
 	day: EventDayEntity;
 
-	@Column({ type: "int" })
+	@Column({ name: "quantity", type: "int", nullable: false })
 	quantity: number;
 
 	@OneToMany(() => SaleEntity, (sale) => sale.dailyProduct)
 	sales: SaleEntity[];
 
-	@CreateDateColumn()
+	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;
 
-	@UpdateDateColumn()
-	updatedAt?: Date;
+	@UpdateDateColumn({ name: "updated_at", nullable: true })
+	updatedAt?: Date | null;
 
-	@DeleteDateColumn()
-	deletedAt?: Date;
+	@DeleteDateColumn({ name: "deleted_at", nullable: true })
+	deletedAt?: Date | null;
 }

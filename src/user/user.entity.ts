@@ -35,7 +35,6 @@ export class UserEntity {
 	role: Role;
 
 	@OneToMany(() => SaleEntity, (sale) => sale.user, {
-		cascade: true,
 		eager: true,
 	})
 	sales: SaleEntity[];

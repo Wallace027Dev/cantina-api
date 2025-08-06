@@ -20,13 +20,18 @@ export class DailyProductEntity {
 
 	@ManyToOne(() => ProductEntity, (product) => product.dailyProducts, {
 		nullable: false,
-		cascade: true,
 		eager: true,
+		onDelete: "CASCADE",
+		onUpdate: "CASCADE",
 	})
 	@JoinColumn({ name: "product_id" })
 	product: ProductEntity;
 
-	@ManyToOne(() => EventDayEntity, (day) => day.products, { nullable: false })
+	@ManyToOne(() => EventDayEntity, (day) => day.products, {
+		nullable: false,
+		onDelete: "CASCADE",
+		onUpdate: "CASCADE",
+	})
 	@JoinColumn({ name: "event_day_id" })
 	day: EventDayEntity;
 

@@ -16,14 +16,14 @@ export class SaleEntity {
 
 	@ManyToOne(() => UserEntity, (user) => user.sales, {
 		nullable: false,
+		onDelete: "CASCADE",
+		onUpdate: "CASCADE",
 	})
 	@JoinColumn({ name: "user_id" })
 	user: UserEntity;
 
 	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales, {
 		nullable: false,
-		cascade: true,
-		eager: true,
 	})
 	@JoinColumn({ name: "daily_product_id" })
 	dailyProduct: DailyProductEntity;

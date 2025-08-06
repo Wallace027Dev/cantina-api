@@ -14,11 +14,17 @@ export class SaleEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@ManyToOne(() => UserEntity, (user) => user.sales, { nullable: false })
+	@ManyToOne(() => UserEntity, (user) => user.sales, {
+		nullable: false,
+	})
 	@JoinColumn({ name: "user_id" })
 	user: UserEntity;
 
-	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales, { nullable: false })
+	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales, {
+		nullable: false,
+		cascade: true,
+		eager: true,
+	})
 	@JoinColumn({ name: "daily_product_id" })
 	dailyProduct: DailyProductEntity;
 

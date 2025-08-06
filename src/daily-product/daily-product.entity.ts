@@ -20,6 +20,8 @@ export class DailyProductEntity {
 
 	@ManyToOne(() => ProductEntity, (product) => product.dailyProducts, {
 		nullable: false,
+		cascade: true,
+		eager: true,
 	})
 	@JoinColumn({ name: "product_id" })
 	product: ProductEntity;

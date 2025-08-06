@@ -1,9 +1,11 @@
 import { v4 as uuid } from "uuid";
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Delete,
 	Get,
+	NotFoundException,
 	Param,
 	Post,
 	Put,
@@ -12,12 +14,16 @@ import { CreateSaleDTO } from "./dto/CreateSale.dto";
 import { SaleService } from "./sale.service";
 import { SaleEntity } from "./sale.entity";
 import { UpdateSaleDTO } from "./dto/UpdateSale.dto";
-import { DailyProductEntity } from "src/daily-product/daily-product.entity";
-import { UserEntity } from "src/user/user.entity";
+import { DailyProductService } from "src/daily-product/daily-product.service";
+import { UserService } from "src/user/user.service";
 
 @Controller("/sales")
 export class SaleController {
-	constructor(private saleService: SaleService) {}
+	constructor(
+		private saleService: SaleService,
+		private dailyProductService: DailyProductService,
+		private userService: UserService,
+	) {}
 
 	@Get()
 	async getAllSales() {
@@ -26,15 +32,34 @@ export class SaleController {
 
 	@Post()
 	async createSale(@Body() saleData: CreateSaleDTO) {
+		// Verifica se o produto do dia existe e tem quantidade suficiente
+		const dailyProduct = await this.dailyProductService.getDailyProductById(
+			saleData.dailyProductId,
+		);
+		if (!dailyProduct) {
+			throw new NotFoundException("Produto do dia não encontrado");
+		}
+
+		if (dailyProduct.quantity < saleData.quantitySold) {
+			throw new BadRequestException("Quantidade insuficiente em estoque");
+		}
+
+		// Verifica se o usuário existe
+		const user = await this.userService.getUserById(saleData.userId);
+		if (!user) {
+			throw new NotFoundException("Usuário não encontrado");
+		}
+
+		// Atualiza estoque
+		dailyProduct.quantity -= saleData.quantitySold;
+		await this.dailyProductService.updateDailyProduct(
+			dailyProduct.id,
+			dailyProduct,
+		);
+
+		// Cria a venda
 		const saleEntity = new SaleEntity();
 		saleEntity.id = uuid();
-
-		const user = new UserEntity();
-		user.id = saleData.userId;
-
-		const dailyProduct = new DailyProductEntity();
-		dailyProduct.id = saleData.dailyProductId;
-
 		saleEntity.user = user;
 		saleEntity.dailyProduct = dailyProduct;
 		saleEntity.quantitySold = saleData.quantitySold;

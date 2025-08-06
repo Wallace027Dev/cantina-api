@@ -9,6 +9,9 @@ export class EventDayEntity {
 	@Column({ name: "date", type: "date", nullable: false, unique: true })
 	date: Date;
 
-	@OneToMany(() => DailyProductEntity, (dp) => dp.day)
+	@OneToMany(() => DailyProductEntity, (dp) => dp.day, {
+		cascade: true,
+		eager: true,
+	})
 	products: DailyProductEntity[];
 }

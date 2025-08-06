@@ -10,8 +10,12 @@ export class DailyProductService {
 		private readonly dailyProductRepository: Repository<DailyProductEntity>,
 	) {}
 
-	async getAllDailyProducts(): Promise<DailyProductEntity[]> {
+	async getAllDailyProducts() {
 		return await this.dailyProductRepository.find();
+	}
+
+	async getDailyProductById(id: string) {
+		return await this.dailyProductRepository.findOneBy({ id });
 	}
 
 	async createDailyProduct(

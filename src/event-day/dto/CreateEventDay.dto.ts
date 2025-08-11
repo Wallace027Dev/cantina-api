@@ -5,7 +5,7 @@ import {
 	IsDate,
 	ValidateNested,
 } from "class-validator";
-import { CreateDailyProductDTO } from "src/daily-product/dto/DailyProduct.dto";
+import { CreateDailyProductDTO } from "../../daily-product/dto/CreateDailyProduct.dto";
 
 export class CreateEventDayDTO {
 	@Type(() => Date)

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DailyProductEntity } from "./daily-product.entity";
@@ -15,12 +15,16 @@ export class DailyProductService {
 	}
 
 	async getDailyProductById(id: string) {
-		return await this.dailyProductRepository.findOneBy({ id });
+		const dailyProduct = await this.dailyProductRepository.findOneBy({ id });
+
+		if (dailyProduct === null) {
+			throw new NotFoundException("Produto do dia nao encontrado.");
+		}
+
+		return dailyProduct;
 	}
 
-	async createDailyProduct(
-		dailyProduct: DailyProductEntity,
-	): Promise<DailyProductEntity> {
+	async createDailyProduct(dailyProduct: DailyProductEntity) {
 		return await this.dailyProductRepository.save(dailyProduct);
 	}
 
@@ -28,7 +32,11 @@ export class DailyProductService {
 		id: string,
 		dataForUpdate: Partial<DailyProductEntity>,
 	) {
-		await this.dailyProductRepository.update(id, dataForUpdate);
+		const existingProduct = await this.dailyProductRepository.findOneBy({ id });
+
+		Object.assign(existingProduct!, dataForUpdate as DailyProductEntity);
+
+		await this.dailyProductRepository.update(id, existingProduct!);
 	}
 
 	async deleteDailyProduct(id: string) {

@@ -1,9 +1,4 @@
-import { Type } from "class-transformer";
-import { IsDate, IsOptional } from "class-validator";
+import { PartialType } from "@nestjs/mapped-types";
+import { CreateEventDayDTO } from "./CreateEventDay.dto";
 
-export class UpdateEventDayDTO {
-	@Type(() => Date)
-	@IsDate({ message: "Date must be a date" })
-	@IsOptional()
-	date: Date;
-}
+export class UpdateEventDayDTO extends PartialType(CreateEventDayDTO) {}

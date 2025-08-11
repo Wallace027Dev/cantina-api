@@ -1,6 +1,4 @@
-import { IsNumber } from "class-validator";
+import { PartialType } from "@nestjs/mapped-types";
+import { CreateSaleDTO } from "./CreateSale.dto";
 
-export class UpdateSaleDTO {
-	@IsNumber({}, { message: "quantitySold precisa ser um number" })
-	quantitySold: number;
-}
+export class UpdateSaleDTO extends PartialType(CreateSaleDTO) {}

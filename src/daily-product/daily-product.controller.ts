@@ -8,7 +8,7 @@ import {
 	Put,
 } from "@nestjs/common";
 import { v4 as uuid } from "uuid";
-import { CreateDailyProductDTO } from "./dto/DailyProduct.dto";
+import { CreateDailyProductDTO } from "./dto/CreateDailyProduct.dto";
 import { DailyProductEntity } from "./daily-product.entity";
 import { UpdateDailyProductDTO } from "./dto/UpdateDailyProduct.dto";
 import { DailyProductService } from "./daily-product.service";

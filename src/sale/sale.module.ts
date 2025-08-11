@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { SaleController } from "./sale.controller";
-import { SaleRepository } from "./sale.repository";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SaleEntity } from "./sale.entity";
 import { SaleService } from "./sale.service";
@@ -14,6 +13,6 @@ import { UserModule } from "src/user/user.module";
 		UserModule,
 	],
 	controllers: [SaleController],
-	providers: [SaleRepository, SaleService],
+	providers: [SaleService],
 })
 export class SaleModule {}

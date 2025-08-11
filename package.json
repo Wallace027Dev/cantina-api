@@ -20,7 +20,10 @@
 		"test:cov": "jest --coverage",
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "typeorm-ts-node-esm --dataSource src/db/data-source-cli.ts"
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/db/data-source-cli.ts",
+		"typeorm:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/db/data-source-cli.ts migration:generate -n",
+		"typeorm:migrate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/db/data-source-cli.ts migration:run",
+		"typeorm:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/db/data-source-cli.ts migration:revert"
 	},
 	"dependencies": {
 		"@nestjs/common": "^11.0.1",
@@ -30,6 +33,7 @@
 		"@nestjs/typeorm": "^11.0.0",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.14.2",
+		"dotenv": "^16.0.3",
 		"pg": "^8.16.3",
 		"reflect-metadata": "^0.2.2",
 		"rxjs": "^7.8.1",

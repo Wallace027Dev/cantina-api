@@ -22,8 +22,8 @@ export class EventDayController {
 
 	@Post()
 	async createEvent(@Body() eventData: CreateEventDayDTO) {
-		const event =
-			await this.eventDayService.createEventDayWithProducts(eventData);
+		const event = await this.eventDayService.createEventDay(eventData);
+
 		return { product: event, message: "Evento criado com sucesso" };
 	}
 

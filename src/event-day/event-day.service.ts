@@ -5,7 +5,6 @@ import { Repository } from "typeorm";
 import { ProductService } from "../product/product.service";
 import { EventDayEntity } from "./event-day.entity";
 import { DailyProductEntity } from "../daily-product/daily-product.entity";
-import { ProductEntity } from "../product/product.entity";
 import { CreateEventDayDTO } from "./dto/CreateEventDay.dto";
 import { UpdateEventDayDTO } from "./dto/UpdateEventDay.dto";
 
@@ -19,63 +18,74 @@ export class EventDayService {
 		private readonly productService: ProductService,
 	) {}
 
-	async getAllEventDays(): Promise<EventDayEntity[]> {
+	async getAllEventDays() {
 		return this.eventDayRepository.find();
 	}
 
-	async createEventDayWithProducts(
-		eventData: CreateEventDayDTO,
-	): Promise<EventDayEntity> {
-		// Cria o evento
-		const eventEntity = this.eventDayRepository.create({
-			date: eventData.date,
-			products: [],
-		});
-		const savedEvent = await this.eventDayRepository.save(eventEntity);
+	async searchEventDayById(id: string) {
+		const event = await this.eventDayRepository.findOneBy({ id });
 
-		// Verifica e cria os produtos do dia
-		const dailyProducts: DailyProductEntity[] = [];
-		for (const p of eventData.products) {
-			const product = await this.productService.searchProductById(p.productId);
-			if (!product) {
-				throw new NotFoundException(
-					`Produto com ID ${p.productId} não encontrado`,
-				);
-			}
-
-			const dp = this.dailyProductRepository.create({
-				product: { id: p.productId } as ProductEntity,
-				day: { id: savedEvent.id } as EventDayEntity,
-				quantity: p.quantity,
-				sales: [],
-			});
-
-			dailyProducts.push(dp);
+		if (event === null) {
+			throw new NotFoundException("Event not found.");
 		}
 
-		// Salva os produtos e anexa ao evento
-		await this.dailyProductRepository.save(dailyProducts);
-		savedEvent.products = dailyProducts;
+		return event;
+	}
 
-		return this.eventDayRepository.save(savedEvent);
+	async createEventDay(eventData: CreateEventDayDTO) {
+		// Cria o evento
+		const eventEntity = new EventDayEntity();
+		eventEntity.date = eventData.date;
+		eventEntity.products = [];
+
+		const savedEvent = await this.eventDayRepository.save(eventEntity);
+
+		const dailyProducts: DailyProductEntity[] = [];
+
+		for (const p of eventData.products) {
+			// Busca o produto correto e armazena
+			const productEntity = await this.productService.searchProductById(
+				p.productId,
+			);
+
+			// Instancia DailyProduct corretamente
+			const dailyProduct = new DailyProductEntity();
+			dailyProduct.product = productEntity; // entidade Produto
+			dailyProduct.day = savedEvent; // entidade Evento
+			dailyProduct.quantity = p.quantity;
+			dailyProduct.sales = [];
+
+			dailyProducts.push(dailyProduct);
+		}
+
+		// Salva todos os DailyProducts
+		await this.dailyProductRepository.save(dailyProducts);
+
+		// Recarrega o evento com os produtos para retorno
+		const eventWithProducts = await this.eventDayRepository.findOne({
+			where: { id: savedEvent.id },
+			relations: ["products", "products.product"],
+		});
+
+		return eventWithProducts!;
 	}
 
 	async updateEventDay(
 		id: string,
 		dataForUpdate: UpdateEventDayDTO,
 	): Promise<EventDayEntity> {
-		const existingEvent = await this.eventDayRepository.findOneBy({ id });
-		if (!existingEvent) throw new NotFoundException("Evento não encontrado");
+		const existingEvent = await this.searchEventDayById(id);
 
 		Object.assign(existingEvent, dataForUpdate);
+
 		return this.eventDayRepository.save(existingEvent);
 	}
 
 	async deleteEventDay(id: string): Promise<EventDayEntity> {
-		const existingEvent = await this.eventDayRepository.findOneBy({ id });
-		if (!existingEvent) throw new NotFoundException("Evento não encontrado");
+		const existingEvent = await this.searchEventDayById(id);
 
 		await this.eventDayRepository.remove(existingEvent);
+
 		return existingEvent;
 	}
 }

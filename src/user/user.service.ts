@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { listUserDTO } from "./dto/ListUser.dto";
 import { UserEntity } from "./user.entity";
 import { Repository } from "typeorm";
 import { UpdateUserDTO } from "./dto/UpdateUser.dto";
+import { CreateUserDTO } from "./dto/CreateUser.dto";
 
 @Injectable()
 export class UserService {
@@ -14,29 +15,48 @@ export class UserService {
 
 	async getAllUsers(): Promise<listUserDTO[]> {
 		const users = await this.userRepository.find();
-		return users.map((user) => {
-			return new listUserDTO(
-				user.id,
-				user.name,
-				user.role,
-				user.sales,
-				user.createdAt,
-				user.updatedAt,
-				user.deletedAt,
-			);
-		});
+
+		return users;
 	}
 
 	async getUserById(id: string) {
-		return await this.userRepository.findOneBy({ id });
+		const user = await this.userRepository.findOne({
+			where: { id },
+			relations: ["sales"],
+		});
+
+		if (user === null) {
+			throw new NotFoundException("Usuário não encontrado.");
+		}
+
+		return user;
 	}
 
-	async createUser(user: UserEntity) {
-		return await this.userRepository.save(user);
+	async searchByName(name: string) {
+		return await this.userRepository.findOne({ where: { name } });
+	}
+
+	async createUser(data: CreateUserDTO) {
+		const userEntity = new UserEntity();
+
+		Object.assign(userEntity, {
+			...data,
+			sales: [],
+		});
+
+		const user = await this.userRepository.save(userEntity);
+
+		return user;
 	}
 
 	async updateUser(id: string, dataForUpdate: UpdateUserDTO) {
-		await this.userRepository.update(id, dataForUpdate);
+		const user = await this.getUserById(id);
+
+		Object.assign(user, dataForUpdate as UserEntity);
+
+		await this.userRepository.save(user);
+
+		return user;
 	}
 
 	async deleteUser(id: string) {

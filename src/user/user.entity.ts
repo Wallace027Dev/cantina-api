@@ -34,9 +34,7 @@ export class UserEntity {
 	@Column({ name: "role", type: "enum", enum: Role, default: Role.VENDOR })
 	role: Role;
 
-	@OneToMany(() => SaleEntity, (sale) => sale.user, {
-		eager: true,
-	})
+	@OneToMany(() => SaleEntity, (sale) => sale.user)
 	sales: SaleEntity[];
 
 	@CreateDateColumn({ name: "created_at" })

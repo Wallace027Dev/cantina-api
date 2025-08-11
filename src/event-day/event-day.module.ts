@@ -5,14 +5,16 @@ import { ProductModule } from "src/product/product.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { EventDayEntity } from "./event-day.entity";
 import { EventDayService } from "./event-day.service";
+import { DailyProductEntity } from "src/daily-product/daily-product.entity";
 
 @Module({
 	imports: [
 		ProductModule,
-		TypeOrmModule.forFeature([EventDayEntity]),
 		DailyProductModule,
+		TypeOrmModule.forFeature([EventDayEntity, DailyProductEntity]),
 	],
 	controllers: [EventDayController],
 	providers: [EventDayService],
+	exports: [EventDayService],
 })
 export class EventDayModule {}

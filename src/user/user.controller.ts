@@ -1,4 +1,3 @@
-import { v4 as uuid } from "uuid";
 import {
 	Body,
 	Controller,
@@ -8,11 +7,10 @@ import {
 	Post,
 	Put,
 } from "@nestjs/common";
-import { UserEntity } from "./user.entity";
-import { listUserDTO } from "./dto/ListUser.dto";
 import { UpdateUserDTO } from "./dto/UpdateUser.dto";
 import { CreateUserDTO } from "./dto/CreateUser.dto";
 import { UserService } from "./user.service";
+import { listUserDTO } from "./dto/ListUser.dto";
 
 @Controller("/users")
 export class UserController {
@@ -21,43 +19,40 @@ export class UserController {
 	@Get()
 	async getAllUsers() {
 		const usersList = await this.userService.getAllUsers();
-		return usersList;
+
+		return usersList.map((user) => {
+			return new listUserDTO(user.id, user.name, user.role);
+		});
+	}
+
+	@Get("/:id")
+	async getUserById(@Param("id") id: string) {
+		const user = await this.userService.getUserById(id);
+		return new listUserDTO(user.id, user.name, user.role, user.sales);
 	}
 
 	@Post()
 	async createUser(@Body() userData: CreateUserDTO) {
-		const userEntity = new UserEntity();
-		userEntity.id = uuid();
-		userEntity.name = userData.name;
-		userEntity.password = userData.password;
-		userEntity.role = userData.role;
-		userEntity.sales = [];
-		userEntity.createdAt = new Date();
-		userEntity.updatedAt = null;
-		userEntity.deletedAt = null;
-
-		await this.userService.createUser(userEntity);
+		const newUser = await this.userService.createUser(userData);
 
 		return {
 			message: "Usuário criado com sucesso",
-			user: new listUserDTO(
-				userEntity.id,
-				userEntity.name,
-				userEntity.role,
-				userEntity.sales,
-				userEntity.createdAt,
-				userEntity.updatedAt,
-				userEntity.deletedAt,
-			),
+			user: new listUserDTO(newUser.id, newUser.name, newUser.role),
 		};
 	}
 
 	@Put("/:id")
 	async updateUser(@Param("id") id: string, @Body() userData: UpdateUserDTO) {
-		await this.userService.updateUser(id, userData);
+		const updatedUser = await this.userService.updateUser(id, userData);
 
 		return {
 			message: "Usuário atualizado com sucesso",
+			user: new listUserDTO(
+				updatedUser.id,
+				updatedUser.name,
+				updatedUser.role,
+				updatedUser.sales,
+			),
 		};
 	}
 

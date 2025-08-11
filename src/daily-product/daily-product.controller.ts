@@ -22,21 +22,16 @@ export class DailyProductController {
 		return await this.dailyProductService.getAllDailyProducts();
 	}
 
-	@Post()
-	async createDailyProduct(@Body() dailyProductData: CreateDailyProductDTO) {
-		const dailyProducts = new DailyProductEntity();
-		dailyProducts.id = uuid();
-		dailyProducts.quantity = dailyProductData.quantity;
-		dailyProducts.createdAt = new Date();
-		dailyProducts.updatedAt = null;
-		dailyProducts.deletedAt = null;
+	// @Post()
+	// async createDailyProduct(@Body() dailyProductData: CreateDailyProductDTO) {
+	// 	const dailyProduct =
+	// 		await this.dailyProductService.createDailyProduct(dailyProductData);
 
-		await this.dailyProductService.createDailyProduct(dailyProducts);
-		return {
-			product: dailyProducts,
-			message: "Produto criado com sucesso",
-		};
-	}
+	// 	return {
+	// 		product: dailyProduct,
+	// 		message: "Produto criado com sucesso",
+	// 	};
+	// }
 
 	@Put("/:id")
 	async updateDailyProduct(

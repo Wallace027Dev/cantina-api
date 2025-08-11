@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DailyProductEntity } from "./daily-product.entity";
+import { ProductEntity } from "src/product/product.entity";
+import { EventDayEntity } from "src/event-day/event-day.entity";
 
 @Injectable()
 export class DailyProductService {
@@ -22,6 +24,24 @@ export class DailyProductService {
 		}
 
 		return dailyProduct;
+	}
+
+	createDailyProductInstance(data: {
+		id: string;
+		productId: string;
+		eventDayId: string;
+		quantity: number;
+	}): DailyProductEntity {
+		const dp = new DailyProductEntity();
+		dp.id = data.id;
+		dp.product = { id: data.productId } as ProductEntity;
+		dp.day = { id: data.eventDayId } as EventDayEntity;
+		dp.quantity = data.quantity;
+		dp.sales = [];
+		dp.createdAt = new Date();
+		dp.updatedAt = null;
+		dp.deletedAt = null;
+		return dp;
 	}
 
 	async createDailyProduct(dailyProduct: DailyProductEntity) {

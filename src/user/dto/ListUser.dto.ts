@@ -6,9 +6,6 @@ export class listUserDTO {
 		readonly id: string,
 		readonly name: string,
 		readonly role: Role,
-		readonly sales: SaleEntity[],
-		readonly createdAt: Date,
-		readonly updatedAt?: Date | null,
-		readonly deletedAt?: Date | null,
+		readonly sales?: SaleEntity[],
 	) {}
 }

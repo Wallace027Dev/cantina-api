@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ProductEntity } from "src/product/product.entity";
 import { Repository } from "typeorm";
+import { CreateProductDTO } from "./dto/CreateProduct.dto";
 
 @Injectable()
 export class ProductService {
@@ -10,23 +11,43 @@ export class ProductService {
 		private readonly productRepository: Repository<ProductEntity>,
 	) {}
 
-	async getAllProducts(): Promise<ProductEntity[]> {
+	async getAllProducts() {
 		return await this.productRepository.find();
 	}
 
-	async getProductById(id: string): Promise<ProductEntity> {
+	async searchProductById(id: string) {
 		const product = await this.productRepository.findOne({ where: { id } });
 
-		if (!product) throw new Error("Product not found.");
-
+		if (product === null) {
+			throw new NotFoundException("Product not found.");
+		}
 		return product;
 	}
 
-	async createProduct(product: ProductEntity): Promise<ProductEntity> {
-		return await this.productRepository.save(product);
+	async productAlreadyExist(name: string) {
+		const product = await this.productRepository.findOne({ where: { name } });
+
+		if (product) {
+			throw new NotFoundException("Product already exists.");
+		}
+	}
+
+	async createProduct(data: CreateProductDTO) {
+		await this.productAlreadyExist(data.name);
+
+		const productEntity = new ProductEntity();
+		productEntity.name = data.name;
+		productEntity.price = data.price;
+		productEntity.dailyProducts = [];
+
+		return await this.productRepository.save(productEntity);
 	}
 
 	async updateProduct(id: string, dataForUpdate: Partial<ProductEntity>) {
-		await this.productRepository.update(id, dataForUpdate);
+		const product = await this.searchProductById(id);
+
+		Object.assign(product, dataForUpdate);
+
+		await this.productRepository.save(product);
 	}
 }

@@ -1,25 +1,44 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+	forwardRef,
+	Inject,
+	Injectable,
+	NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { ProductService } from "../product/product.service";
 import { EventDayEntity } from "./event-day.entity";
-import { DailyProductEntity } from "../daily-product/daily-product.entity";
 import { CreateEventDayDTO } from "./dto/CreateEventDay.dto";
 import { UpdateEventDayDTO } from "./dto/UpdateEventDay.dto";
+import { DailyProductService } from "../daily-product/daily-product.service";
 
 @Injectable()
 export class EventDayService {
 	constructor(
 		@InjectRepository(EventDayEntity)
 		private readonly eventDayRepository: Repository<EventDayEntity>,
-		@InjectRepository(DailyProductEntity)
-		private readonly dailyProductRepository: Repository<DailyProductEntity>,
+		@Inject(forwardRef(() => DailyProductService))
+		private readonly dailyProductService: DailyProductService,
 		private readonly productService: ProductService,
 	) {}
 
 	async getAllEventDays() {
-		return this.eventDayRepository.find();
+		return this.eventDayRepository.find({
+			relations: ["products", "products.product"],
+			select: {
+				id: true,
+				date: true,
+				products: {
+					id: true,
+					quantity: true,
+					product: {
+						id: true,
+						name: true,
+					},
+				},
+			},
+		});
 	}
 
 	async searchEventDayById(id: string) {
@@ -33,41 +52,33 @@ export class EventDayService {
 	}
 
 	async createEventDay(eventData: CreateEventDayDTO) {
-		// Cria o evento
-		const eventEntity = new EventDayEntity();
-		eventEntity.date = eventData.date;
-		eventEntity.products = [];
-
+		// Cria e salva o evento inicialmente (sem produtos)
+		const eventEntity = this.eventDayRepository.create({
+			date: eventData.date,
+		});
 		const savedEvent = await this.eventDayRepository.save(eventEntity);
 
-		const dailyProducts: DailyProductEntity[] = [];
-
-		for (const p of eventData.products) {
-			// Busca o produto correto e armazena
-			const productEntity = await this.productService.searchProductById(
-				p.productId,
+		// Cria um array de promises para criar daily products
+		const dailyProductsPromises = eventData.products.map(async (product) => {
+			const productExists = await this.productService.searchProductById(
+				product.productId,
 			);
 
-			// Instancia DailyProduct corretamente
-			const dailyProduct = new DailyProductEntity();
-			dailyProduct.product = productEntity; // entidade Produto
-			dailyProduct.day = savedEvent; // entidade Evento
-			dailyProduct.quantity = p.quantity;
-			dailyProduct.sales = [];
+			const dailyProductData = {
+				productId: productExists.id,
+				eventDayId: savedEvent.id,
+				quantity: product.quantity,
+			};
 
-			dailyProducts.push(dailyProduct);
-		}
-
-		// Salva todos os DailyProducts
-		await this.dailyProductRepository.save(dailyProducts);
-
-		// Recarrega o evento com os produtos para retorno
-		const eventWithProducts = await this.eventDayRepository.findOne({
-			where: { id: savedEvent.id },
-			relations: ["products", "products.product"],
+			return this.dailyProductService.createDailyProduct(dailyProductData);
 		});
 
-		return eventWithProducts!;
+		const createdDailyProducts = await Promise.all(dailyProductsPromises);
+
+		// Associa os daily products criados ao evento
+		savedEvent.products = createdDailyProducts;
+
+		return savedEvent;
 	}
 
 	async updateEventDay(

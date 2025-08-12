@@ -30,12 +30,14 @@ export class EventDayController {
 	@Put("/:id")
 	async updateEvent(@Param("id") id: string, @Body() data: UpdateEventDayDTO) {
 		const updatedEvent = await this.eventDayService.updateEventDay(id, data);
+
 		return { event: updatedEvent, message: "Evento atualizado com sucesso" };
 	}
 
 	@Delete("/:id")
 	async deleteEvent(@Param("id") id: string) {
 		const removedEvent = await this.eventDayService.deleteEventDay(id);
+
 		return { event: removedEvent, message: "Evento deletado com sucesso" };
 	}
 }

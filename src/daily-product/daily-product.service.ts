@@ -61,7 +61,7 @@ export class DailyProductService {
 		}
 	}
 
-	createDailyProductInstance(data: {
+	private createDailyProductInstance(data: {
 		productId: string;
 		eventDayId: string;
 		quantity: number;

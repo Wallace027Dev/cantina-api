@@ -1,3 +1,4 @@
+import type { Cache } from "cache-manager";
 import {
 	Body,
 	Controller,
@@ -9,13 +10,13 @@ import {
 	Put,
 	UseInterceptors,
 } from "@nestjs/common";
+import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
 import { UpdateUserDTO } from "./dto/UpdateUser.dto";
 import { CreateUserDTO } from "./dto/CreateUser.dto";
 import { UserService } from "./user.service";
 import { listUserDTO } from "./dto/ListUser.dto";
-import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
 import { UserEntity } from "./user.entity";
-import type { Cache } from "cache-manager";
+import { HashPasswordPipe } from "../../resources/pipes/hash-password.pipe";
 
 @Controller("/users")
 export class UserController {
@@ -51,8 +52,14 @@ export class UserController {
 	}
 
 	@Post()
-	async createUser(@Body() userData: CreateUserDTO) {
-		const newUser = await this.userService.createUser(userData);
+	async createUser(
+		@Body("password", HashPasswordPipe) hashedPassword: string,
+		@Body() userData: CreateUserDTO,
+	) {
+		const newUser = await this.userService.createUser({
+			...userData,
+			password: hashedPassword,
+		});
 
 		return {
 			message: "Usuário criado com sucesso",

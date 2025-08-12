@@ -1,3 +1,4 @@
+import { Matches } from "class-validator";
 import { SaleEntity } from "../sale/sale.entity";
 import {
 	Entity,
@@ -28,6 +29,10 @@ export class UserEntity {
 	name: string;
 
 	@Column({ name: "password", type: "varchar", length: 100, nullable: false })
+	@Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W+).{8,30}$/, {
+		message:
+			"A senha deve conter pelo menos uma letra minúscula, uma letra maiúscula, um dígito, um caractere especial e ter entre 8 e 30 caracteres",
+	})
 	password: string;
 
 	@Column({ name: "role", type: "enum", enum: Role, default: Role.VENDOR })

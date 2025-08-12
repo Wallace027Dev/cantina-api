@@ -13,6 +13,7 @@ import { PostgresConfigService } from "./config/postgres.config.service";
 import { GlobalExceptionFilter } from "./resources/filters/global-exception-filter";
 import { redisStore } from "cache-manager-redis-store";
 import { CacheModule } from "@nestjs/cache-manager";
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
 	imports: [
@@ -32,6 +33,7 @@ import { CacheModule } from "@nestjs/cache-manager";
 			useClass: PostgresConfigService,
 			inject: [PostgresConfigService],
 		}),
+		AuthModule,
 	],
 	providers: [{ provide: APP_FILTER, useClass: GlobalExceptionFilter }],
 })

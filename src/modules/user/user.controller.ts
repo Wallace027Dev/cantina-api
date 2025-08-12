@@ -30,6 +30,8 @@ export class UserController {
 	async getAllUsers() {
 		const usersList = await this.userService.getAllUsers();
 
+		await this.cacheManager.set("users", usersList);
+
 		return usersList.map((user) => {
 			return new listUserDTO(user.id, user.name, user.role);
 		});
@@ -61,6 +63,8 @@ export class UserController {
 			password: hashedPassword,
 		});
 
+		await this.cacheManager.del(newUser.id);
+
 		return {
 			message: "Usuário criado com sucesso",
 			user: new listUserDTO(newUser.id, newUser.name, newUser.role),
@@ -70,6 +74,8 @@ export class UserController {
 	@Put("/:id")
 	async updateUser(@Param("id") id: string, @Body() userData: UpdateUserDTO) {
 		const updatedUser = await this.userService.updateUser(id, userData);
+
+		await this.cacheManager.del(id);
 
 		return {
 			message: "Usuário atualizado com sucesso",
@@ -85,6 +91,9 @@ export class UserController {
 	@Delete("/:id")
 	async deleteUser(@Param("id") id: string) {
 		await this.userService.deleteUser(id);
+
+		await this.cacheManager.del(id);
+
 		return {
 			message: "Usuário deletado com sucesso",
 			user: id,

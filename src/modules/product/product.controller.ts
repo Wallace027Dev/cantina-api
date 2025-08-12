@@ -1,7 +1,9 @@
+import type { Cache } from "cache-manager";
 import {
 	Body,
 	Controller,
 	Get,
+	Inject,
 	Param,
 	Post,
 	Put,
@@ -10,21 +12,30 @@ import {
 import { ProductService } from "./product.service";
 import { CreateProductDTO } from "./dto/CreateProduct.dto";
 import { UpdateProductDTO } from "./dto/UpdateProduct.dto";
-import { CacheInterceptor } from "@nestjs/cache-manager";
+import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("/products")
 export class ProductController {
-	constructor(private productService: ProductService) {}
+	constructor(
+		private productService: ProductService,
+		@Inject(CACHE_MANAGER) private cacheManager: Cache,
+	) {}
 
 	@Get()
 	@UseInterceptors(CacheInterceptor)
 	async getAllProducts() {
-		return await this.productService.getAllProducts();
+		const products = await this.productService.getAllProducts();
+
+		await this.cacheManager.set("products", products);
+
+		return products;
 	}
 
 	@Post()
 	async createProduct(@Body() productData: CreateProductDTO) {
 		const newProduct = await this.productService.createProduct(productData);
+
+		await this.cacheManager.del("products");
 
 		return {
 			product: newProduct,
@@ -41,6 +52,8 @@ export class ProductController {
 			id,
 			productData,
 		);
+
+		await this.cacheManager.del("products");
 
 		return {
 			product: productEntity,

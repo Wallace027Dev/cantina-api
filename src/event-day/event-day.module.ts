@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { EventDayController } from "./event-day.controller";
 import { DailyProductModule } from "src/daily-product/daily-product.module";
 import { ProductModule } from "src/product/product.module";
@@ -10,7 +10,7 @@ import { DailyProductEntity } from "src/daily-product/daily-product.entity";
 @Module({
 	imports: [
 		ProductModule,
-		DailyProductModule,
+		forwardRef(() => DailyProductModule),
 		TypeOrmModule.forFeature([EventDayEntity, DailyProductEntity]),
 	],
 	controllers: [EventDayController],

@@ -7,13 +7,11 @@ import {
 	Post,
 	Put,
 } from "@nestjs/common";
-import { v4 as uuid } from "uuid";
 import { CreateDailyProductDTO } from "./dto/CreateDailyProduct.dto";
-import { DailyProductEntity } from "./daily-product.entity";
 import { UpdateDailyProductDTO } from "./dto/UpdateDailyProduct.dto";
 import { DailyProductService } from "./daily-product.service";
 
-@Controller("/daily-products")
+@Controller("daily-products")
 export class DailyProductController {
 	constructor(private dailyProductService: DailyProductService) {}
 
@@ -22,16 +20,16 @@ export class DailyProductController {
 		return await this.dailyProductService.getAllDailyProducts();
 	}
 
-	// @Post()
-	// async createDailyProduct(@Body() dailyProductData: CreateDailyProductDTO) {
-	// 	const dailyProduct =
-	// 		await this.dailyProductService.createDailyProduct(dailyProductData);
+	@Post()
+	async createDailyProduct(@Body() data: CreateDailyProductDTO) {
+		const dailyProduct =
+			await this.dailyProductService.createDailyProduct(data);
 
-	// 	return {
-	// 		product: dailyProduct,
-	// 		message: "Produto criado com sucesso",
-	// 	};
-	// }
+		return {
+			product: dailyProduct,
+			message: "Produto criado com sucesso",
+		};
+	}
 
 	@Put("/:id")
 	async updateDailyProduct(

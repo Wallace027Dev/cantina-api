@@ -6,12 +6,11 @@ export class EventDayEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@Column({ name: "date", type: "date", nullable: false, unique: true })
+	@Column({ name: "date", type: "date", unique: true })
 	date: Date;
 
 	@OneToMany(() => DailyProductEntity, (dp) => dp.day, {
 		cascade: true,
-		eager: true,
 	})
 	products: DailyProductEntity[];
 }

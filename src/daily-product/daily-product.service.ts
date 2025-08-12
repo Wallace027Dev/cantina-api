@@ -1,62 +1,102 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+	ConflictException,
+	Injectable,
+	NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DailyProductEntity } from "./daily-product.entity";
 import { ProductEntity } from "src/product/product.entity";
 import { EventDayEntity } from "src/event-day/event-day.entity";
+import { CreateDailyProductDTO } from "./dto/CreateDailyProduct.dto";
+import { EventDayService } from "src/event-day/event-day.service";
+import { ProductService } from "src/product/product.service";
 
 @Injectable()
 export class DailyProductService {
 	constructor(
 		@InjectRepository(DailyProductEntity)
 		private readonly dailyProductRepository: Repository<DailyProductEntity>,
+		private readonly eventDayService: EventDayService,
+		private readonly productService: ProductService,
 	) {}
 
 	async getAllDailyProducts() {
-		return await this.dailyProductRepository.find();
+		return await this.dailyProductRepository.find({
+			relations: ["product", "day"],
+			select: {
+				id: true,
+				quantity: true,
+				product: {
+					id: true,
+					name: true,
+					price: true,
+				},
+				day: {
+					id: true,
+					date: true,
+				},
+			},
+		});
 	}
 
-	async getDailyProductById(id: string) {
+	async searchDailyProductById(id: string) {
 		const dailyProduct = await this.dailyProductRepository.findOneBy({ id });
 
 		if (dailyProduct === null) {
-			throw new NotFoundException("Produto do dia nao encontrado.");
+			throw new NotFoundException("Produto do dia não encontrado.");
 		}
 
 		return dailyProduct;
 	}
 
+	private async verifyDailyProductExists(productId: string, date: Date) {
+		const dailyProduct = await this.dailyProductRepository.findOneBy({
+			product: { id: productId },
+			day: { date },
+		});
+
+		if (dailyProduct) {
+			throw new ConflictException("O produto já está registrado nesse dia.");
+		}
+	}
+
 	createDailyProductInstance(data: {
-		id: string;
 		productId: string;
 		eventDayId: string;
 		quantity: number;
 	}): DailyProductEntity {
-		const dp = new DailyProductEntity();
-		dp.id = data.id;
-		dp.product = { id: data.productId } as ProductEntity;
-		dp.day = { id: data.eventDayId } as EventDayEntity;
-		dp.quantity = data.quantity;
-		dp.sales = [];
-		dp.createdAt = new Date();
-		dp.updatedAt = null;
-		dp.deletedAt = null;
-		return dp;
+		const dailyProductEntity = new DailyProductEntity();
+
+		dailyProductEntity.product = { id: data.productId } as ProductEntity;
+		dailyProductEntity.day = { id: data.eventDayId } as EventDayEntity;
+		dailyProductEntity.quantity = data.quantity;
+		dailyProductEntity.sales = [];
+
+		return dailyProductEntity;
 	}
 
-	async createDailyProduct(dailyProduct: DailyProductEntity) {
-		return await this.dailyProductRepository.save(dailyProduct);
+	async createDailyProduct(dailyProduct: CreateDailyProductDTO) {
+		const { date } = await this.eventDayService.searchEventDayById(
+			dailyProduct.eventDayId,
+		);
+		await this.productService.searchProductById(dailyProduct.productId);
+		await this.verifyDailyProductExists(dailyProduct.productId, date);
+
+		const dailyProductEntiy = this.createDailyProductInstance(dailyProduct);
+
+		return await this.dailyProductRepository.save(dailyProductEntiy);
 	}
 
 	async updateDailyProduct(
 		id: string,
 		dataForUpdate: Partial<DailyProductEntity>,
 	) {
-		const existingProduct = await this.dailyProductRepository.findOneBy({ id });
+		const existingProduct = await this.searchDailyProductById(id);
 
-		Object.assign(existingProduct!, dataForUpdate as DailyProductEntity);
+		Object.assign(existingProduct, dataForUpdate as DailyProductEntity);
 
-		await this.dailyProductRepository.update(id, existingProduct!);
+		await this.dailyProductRepository.update(id, existingProduct);
 	}
 
 	async deleteDailyProduct(id: string) {

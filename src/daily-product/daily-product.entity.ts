@@ -19,8 +19,7 @@ export class DailyProductEntity {
 	id: string;
 
 	@ManyToOne(() => ProductEntity, (product) => product.dailyProducts, {
-		nullable: false,
-		eager: true,
+		eager: false,
 		onDelete: "CASCADE",
 		onUpdate: "CASCADE",
 	})
@@ -28,7 +27,6 @@ export class DailyProductEntity {
 	product: ProductEntity;
 
 	@ManyToOne(() => EventDayEntity, (day) => day.products, {
-		nullable: false,
 		onDelete: "CASCADE",
 		onUpdate: "CASCADE",
 	})

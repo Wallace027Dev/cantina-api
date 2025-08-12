@@ -33,13 +33,9 @@ export class SaleController {
 	@Post()
 	async createSale(@Body() saleData: CreateSaleDTO) {
 		// Verifica se o produto do dia existe e tem quantidade suficiente
-		const dailyProduct = await this.dailyProductService.getDailyProductById(
+		const dailyProduct = await this.dailyProductService.searchDailyProductById(
 			saleData.dailyProductId,
 		);
-		if (!dailyProduct) {
-			throw new NotFoundException("Produto do dia não encontrado");
-		}
-
 		if (dailyProduct.quantity < saleData.quantitySold) {
 			throw new BadRequestException("Quantidade insuficiente em estoque");
 		}

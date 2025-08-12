@@ -15,7 +15,7 @@ export class SaleEntity {
 	id: string;
 
 	@ManyToOne(() => UserEntity, (user) => user.sales, {
-		nullable: false,
+		
 		onDelete: "CASCADE",
 		onUpdate: "CASCADE",
 	})
@@ -23,7 +23,7 @@ export class SaleEntity {
 	user: UserEntity;
 
 	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales, {
-		nullable: false,
+		
 	})
 	@JoinColumn({ name: "daily_product_id" })
 	dailyProduct: DailyProductEntity;

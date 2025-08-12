@@ -14,7 +14,7 @@ export class ProductEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@Column({ name: "name", length: 100, nullable: false, unique: true })
+	@Column({ name: "name", length: 100, unique: true })
 	name: string;
 
 	@Column({
@@ -22,7 +22,6 @@ export class ProductEntity {
 		type: "decimal",
 		precision: 10,
 		scale: 2,
-		nullable: false,
 	})
 	price: number;
 

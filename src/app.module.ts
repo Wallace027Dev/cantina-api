@@ -7,6 +7,8 @@ import { EventDayModule } from "./event-day/event-day.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { PostgresConfigService } from "./config/postgres.config.service";
 import { ConfigModule } from "@nestjs/config";
+import { APP_FILTER } from "@nestjs/core";
+import { GlobalExceptionFilter } from "./filters/global-exception-filter";
 
 @Module({
 	imports: [
@@ -21,5 +23,6 @@ import { ConfigModule } from "@nestjs/config";
 			inject: [PostgresConfigService],
 		}),
 	],
+	providers: [{ provide: APP_FILTER, useClass: GlobalExceptionFilter }],
 })
 export class AppModule {}

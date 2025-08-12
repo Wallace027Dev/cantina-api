@@ -6,16 +6,19 @@ import {
 	Param,
 	Post,
 	Put,
+	UseInterceptors,
 } from "@nestjs/common";
 import { CreateDailyProductDTO } from "./dto/CreateDailyProduct.dto";
 import { UpdateDailyProductDTO } from "./dto/UpdateDailyProduct.dto";
 import { DailyProductService } from "./daily-product.service";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("daily-products")
 export class DailyProductController {
 	constructor(private dailyProductService: DailyProductService) {}
 
 	@Get()
+	@UseInterceptors(CacheInterceptor)
 	async getAllDailyProducts() {
 		return await this.dailyProductService.getAllDailyProducts();
 	}

@@ -6,16 +6,19 @@ import {
 	Param,
 	Post,
 	Put,
+	UseInterceptors,
 } from "@nestjs/common";
 import { EventDayService } from "./event-day.service";
 import { CreateEventDayDTO } from "./dto/CreateEventDay.dto";
 import { UpdateEventDayDTO } from "./dto/UpdateEventDay.dto";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("/event-days")
 export class EventDayController {
 	constructor(private readonly eventDayService: EventDayService) {}
 
 	@Get()
+	@UseInterceptors(CacheInterceptor)
 	async getAllEvents() {
 		return await this.eventDayService.getAllEventDays();
 	}

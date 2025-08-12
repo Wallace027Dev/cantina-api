@@ -3,20 +3,29 @@ import {
 	Controller,
 	Delete,
 	Get,
+	Inject,
 	Param,
 	Post,
 	Put,
+	UseInterceptors,
 } from "@nestjs/common";
 import { UpdateUserDTO } from "./dto/UpdateUser.dto";
 import { CreateUserDTO } from "./dto/CreateUser.dto";
 import { UserService } from "./user.service";
 import { listUserDTO } from "./dto/ListUser.dto";
+import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
+import { UserEntity } from "./user.entity";
+import type { Cache } from "cache-manager";
 
 @Controller("/users")
 export class UserController {
-	constructor(private userService: UserService) {}
+	constructor(
+		private userService: UserService,
+		@Inject(CACHE_MANAGER) private cacheManager: Cache,
+	) {}
 
 	@Get()
+	@UseInterceptors(CacheInterceptor)
 	async getAllUsers() {
 		const usersList = await this.userService.getAllUsers();
 
@@ -27,8 +36,18 @@ export class UserController {
 
 	@Get("/:id")
 	async getUserWithSales(@Param("id") id: string) {
-		const user = await this.userService.getUserWithSales(id);
-		return new listUserDTO(user.id, user.name, user.role, user.sales);
+		let user = await this.cacheManager.get<UserEntity>(id);
+
+		if (!user) {
+			user = await this.userService.getUserWithSales(id);
+
+			await this.cacheManager.set(id, user);
+		}
+
+		return {
+			message: "Usuário encontrado com sucesso",
+			user: new listUserDTO(user.id, user.name, user.role, user.sales),
+		};
 	}
 
 	@Post()

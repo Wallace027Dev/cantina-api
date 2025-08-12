@@ -1,13 +1,23 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Put,
+	UseInterceptors,
+} from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDTO } from "./dto/CreateProduct.dto";
 import { UpdateProductDTO } from "./dto/UpdateProduct.dto";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("/products")
 export class ProductController {
 	constructor(private productService: ProductService) {}
 
 	@Get()
+	@UseInterceptors(CacheInterceptor)
 	async getAllProducts() {
 		return await this.productService.getAllProducts();
 	}

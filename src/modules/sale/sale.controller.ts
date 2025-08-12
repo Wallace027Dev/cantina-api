@@ -1,12 +1,14 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, UseInterceptors } from "@nestjs/common";
 import { CreateSaleDTO } from "./dto/CreateSale.dto";
 import { SaleService } from "./sale.service";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("/sales")
 export class SaleController {
 	constructor(private saleService: SaleService) {}
 
 	@Get()
+	@UseInterceptors(CacheInterceptor)
 	async getAllSales() {
 		return await this.saleService.getAllSales();
 	}

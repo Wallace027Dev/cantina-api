@@ -26,8 +26,8 @@ export class UserController {
 	}
 
 	@Get("/:id")
-	async getUserById(@Param("id") id: string) {
-		const user = await this.userService.getUserById(id);
+	async getUserWithSales(@Param("id") id: string) {
+		const user = await this.userService.getUserWithSales(id);
 		return new listUserDTO(user.id, user.name, user.role, user.sales);
 	}
 

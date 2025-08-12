@@ -15,16 +15,13 @@ export class SaleEntity {
 	id: string;
 
 	@ManyToOne(() => UserEntity, (user) => user.sales, {
-		
 		onDelete: "CASCADE",
 		onUpdate: "CASCADE",
 	})
 	@JoinColumn({ name: "user_id" })
 	user: UserEntity;
 
-	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales, {
-		
-	})
+	@ManyToOne(() => DailyProductEntity, (dp) => dp.sales)
 	@JoinColumn({ name: "daily_product_id" })
 	dailyProduct: DailyProductEntity;
 

@@ -19,7 +19,6 @@ export class DailyProductEntity {
 	id: string;
 
 	@ManyToOne(() => ProductEntity, (product) => product.dailyProducts, {
-		eager: false,
 		onDelete: "CASCADE",
 		onUpdate: "CASCADE",
 	})

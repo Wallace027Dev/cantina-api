@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from "@nestjs/typeorm";
-import { DailyProductEntity } from "src/daily-product/daily-product.entity";
-import { EventDayEntity } from "src/event-day/event-day.entity";
-import { ProductEntity } from "src/product/product.entity";
-import { SaleEntity } from "src/sale/sale.entity";
-import { UserEntity } from "src/user/user.entity";
+
+import { DailyProductEntity } from "../modules/daily-product/daily-product.entity";
+import { EventDayEntity } from "../modules/event-day/event-day.entity";
+import { ProductEntity } from "../modules/product/product.entity";
+import { SaleEntity } from "../modules/sale/sale.entity";
+import { UserEntity } from "../modules/user/user.entity";
 
 @Injectable()
 export class PostgresConfigService implements TypeOrmOptionsFactory {

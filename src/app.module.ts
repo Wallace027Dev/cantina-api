@@ -1,14 +1,16 @@
 import { Module } from "@nestjs/common";
-import { UserModule } from "./user/user.module";
-import { SaleModule } from "./sale/sale.module";
-import { ProductModule } from "./product/product.module";
-import { DailyProductModule } from "./daily-product/daily-product.module";
-import { EventDayModule } from "./event-day/event-day.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { PostgresConfigService } from "./config/postgres.config.service";
 import { ConfigModule } from "@nestjs/config";
 import { APP_FILTER } from "@nestjs/core";
-import { GlobalExceptionFilter } from "./filters/global-exception-filter";
+
+import { UserModule } from "./modules/user/user.module";
+import { SaleModule } from "./modules/sale/sale.module";
+import { ProductModule } from "./modules/product/product.module";
+import { DailyProductModule } from "./modules/daily-product/daily-product.module";
+import { EventDayModule } from "./modules/event-day/event-day.module";
+
+import { PostgresConfigService } from "./config/postgres.config.service";
+import { GlobalExceptionFilter } from "./resources/filters/global-exception-filter";
 
 @Module({
 	imports: [

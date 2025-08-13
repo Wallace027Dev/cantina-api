@@ -19,6 +19,8 @@ import { UserEntity } from "./user.entity";
 import { UserService } from "./user.service";
 import { HashPasswordPipe } from "../../resources/pipes/hash-password.pipe";
 import { AuthGuard } from "../auth/auth.guard";
+import { Roles } from "src/resources/decorators/roles.decorator";
+import { RolesGuard } from "../auth/roles.guard";
 
 @Controller("/users")
 export class UserController {
@@ -27,18 +29,24 @@ export class UserController {
 		@Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
 	) {}
 
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Get()
-	@UseGuards(AuthGuard)
 	@UseInterceptors(CacheInterceptor)
 	async getAllUsers() {
 		const users = await this.userService.getAllUsers();
 		await this.cacheManager.set("users", users);
 
-		return users.map((user) => new listUserDTO(user.id, user.name, user.role));
+		return {
+			message: "Usuários encontrados com sucesso",
+			users: users.map(
+				(user) => new listUserDTO(user.id, user.name, user.role),
+			),
+		};
 	}
 
-	@Get("/:id")
 	@UseGuards(AuthGuard)
+	@Get("/:id")
 	async getUserWithSales(@Param("id") id: string) {
 		let user = await this.cacheManager.get<UserEntity>(id);
 
@@ -53,6 +61,8 @@ export class UserController {
 		};
 	}
 
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Post()
 	async createUser(
 		@Body("password", HashPasswordPipe) hashedPassword: string,
@@ -71,8 +81,9 @@ export class UserController {
 		};
 	}
 
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Put("/:id")
-	@UseGuards(AuthGuard)
 	async updateUser(@Param("id") id: string, @Body() userData: UpdateUserDTO) {
 		const updatedUser = await this.userService.updateUser(id, userData);
 
@@ -92,6 +103,8 @@ export class UserController {
 		};
 	}
 
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Delete("/:id")
 	async deleteUser(@Param("id") id: string) {
 		const deletedUser = await this.userService.deleteUser(id);

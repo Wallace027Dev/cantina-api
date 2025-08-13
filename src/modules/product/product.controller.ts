@@ -15,6 +15,8 @@ import { CreateProductDTO } from "./dto/CreateProduct.dto";
 import { UpdateProductDTO } from "./dto/UpdateProduct.dto";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
 import { AuthGuard } from "../auth/auth.guard";
+import { RolesGuard } from "../auth/roles.guard";
+import { Roles } from "src/resources/decorators/roles.decorator";
 
 @Controller("/products")
 export class ProductController {
@@ -23,17 +25,18 @@ export class ProductController {
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {}
 
-	@Get()
 	@UseInterceptors(CacheInterceptor)
+	@Get()
 	async getAllProducts() {
 		const products = await this.productService.getAllProducts();
 
 		await this.cacheManager.set("products", products);
 
-		return products;
+		return { message: "Produtos encontrados com sucesso", products };
 	}
 
-	@UseGuards(AuthGuard)
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Post()
 	async createProduct(@Body() productData: CreateProductDTO) {
 		const newProduct = await this.productService.createProduct(productData);
@@ -41,12 +44,13 @@ export class ProductController {
 		await this.cacheManager.del("products");
 
 		return {
-			product: newProduct,
 			message: "Produto criado com sucesso",
+			product: newProduct,
 		};
 	}
 
-	@UseGuards(AuthGuard)
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Put("/:id")
 	async updateProduct(
 		@Param("id") id: string,
@@ -60,8 +64,8 @@ export class ProductController {
 		await this.cacheManager.del("products");
 
 		return {
-			product: productEntity,
 			message: "Produto atualizado com sucesso",
+			product: productEntity,
 		};
 	}
 }

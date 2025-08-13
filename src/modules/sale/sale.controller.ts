@@ -14,9 +14,11 @@ import {
 import { CreateSaleDTO } from "./dto/CreateSale.dto";
 import { SaleService } from "./sale.service";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
+import { RolesGuard } from "../auth/roles.guard";
+import { Roles } from "../../resources/decorators/roles.decorator";
 import * as authGuard from "../auth/auth.guard";
 
-@UseGuards(authGuard.AuthGuard)
+@UseGuards(authGuard.AuthGuard, RolesGuard)
 @Controller("sales")
 export class SaleController {
 	constructor(
@@ -32,8 +34,9 @@ export class SaleController {
 		}
 	}
 
-	@Get()
+	@Roles("ADMIN")
 	@UseInterceptors(CacheInterceptor)
+	@Get()
 	async getAllSales(@Req() req: authGuard.RequisitionWithUser) {
 		this.ensureAdmin(req.user.role);
 
@@ -62,15 +65,16 @@ export class SaleController {
 		}
 
 		return {
-			message: `Vendas do usuário ${req.user.sub} encontradas com sucesso`,
+			message: `Vendas do usuário ${req.user.userName} encontradas com sucesso`,
 			sales,
 		};
 	}
 
+	@Roles("ADMIN")
 	@Get("id/:id")
 	async getSalesByUserId(
-		@Req() req: authGuard.RequisitionWithUser,
 		@Param("id") id: string,
+		@Req() req: authGuard.RequisitionWithUser,
 	) {
 		this.ensureAdmin(req.user.role);
 
@@ -83,7 +87,7 @@ export class SaleController {
 		}
 
 		return {
-			message: `Vendas do usuário ${id} encontradas com sucesso`,
+			message: `Vendas do usuário ${req.user.userName} encontradas com sucesso`,
 			sales,
 		};
 	}
@@ -103,6 +107,6 @@ export class SaleController {
 			this.cacheManager.del(`sales:user:${req.user.sub}`),
 		]);
 
-		return { sale: saleEntity, message: "Venda criada com sucesso" };
+		return { message: "Venda criada com sucesso", sale: saleEntity };
 	}
 }

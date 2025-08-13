@@ -16,6 +16,8 @@ import { CreateEventDayDTO } from "./dto/CreateEventDay.dto";
 import { UpdateEventDayDTO } from "./dto/UpdateEventDay.dto";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
 import { AuthGuard } from "../auth/auth.guard";
+import { RolesGuard } from "../auth/roles.guard";
+import { Roles } from "src/resources/decorators/roles.decorator";
 
 @Controller("/event-days")
 export class EventDayController {
@@ -24,43 +26,46 @@ export class EventDayController {
 		@Inject(CACHE_MANAGER) private cacheManager: Cache,
 	) {}
 
-	@Get()
 	@UseInterceptors(CacheInterceptor)
+	@Get()
 	async getAllEvents() {
 		const events = await this.eventDayService.getAllEventDays();
 
 		await this.cacheManager.set("events", events);
 
-		return events;
+		return { message: "Eventos encontrados com sucesso", events };
 	}
 
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Post()
-	@UseGuards(AuthGuard)
 	async createEvent(@Body() eventData: CreateEventDayDTO) {
 		const event = await this.eventDayService.createEventDay(eventData);
 
 		await this.cacheManager.del("events");
 
-		return { product: event, message: "Evento criado com sucesso" };
+		return { message: "Evento criado com sucesso", product: event };
 	}
 
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Put("/:id")
-	@UseGuards(AuthGuard)
 	async updateEvent(@Param("id") id: string, @Body() data: UpdateEventDayDTO) {
 		const updatedEvent = await this.eventDayService.updateEventDay(id, data);
 
 		await this.cacheManager.del("events");
 
-		return { event: updatedEvent, message: "Evento atualizado com sucesso" };
+		return { message: "Evento atualizado com sucesso", event: updatedEvent };
 	}
 
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles("ADMIN")
 	@Delete("/:id")
-	@UseGuards(AuthGuard)
 	async deleteEvent(@Param("id") id: string) {
 		const removedEvent = await this.eventDayService.deleteEventDay(id);
 
 		await this.cacheManager.del("events");
 
-		return { event: removedEvent, message: "Evento deletado com sucesso" };
+		return { message: "Evento deletado com sucesso", event: removedEvent };
 	}
 }

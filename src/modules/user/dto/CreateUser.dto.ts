@@ -16,7 +16,7 @@ export class CreateUserDTO {
 	@IsEnum([Role.ADMIN, Role.VENDOR], {
 		message: "Role precisa ser 'VENDOR' ou 'ADMIN'",
 	})
-	role: Role;
+	role: Role = Role.VENDOR;
 
 	@Type(() => CreateDailyProductDTO)
 	@IsOptional()

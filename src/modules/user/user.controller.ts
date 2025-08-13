@@ -14,30 +14,27 @@ import {
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
 import { UpdateUserDTO } from "./dto/UpdateUser.dto";
 import { CreateUserDTO } from "./dto/CreateUser.dto";
-import { UserService } from "./user.service";
 import { listUserDTO } from "./dto/ListUser.dto";
 import { UserEntity } from "./user.entity";
+import { UserService } from "./user.service";
 import { HashPasswordPipe } from "../../resources/pipes/hash-password.pipe";
 import { AuthGuard } from "../auth/auth.guard";
 
 @Controller("/users")
 export class UserController {
 	constructor(
-		private userService: UserService,
-		@Inject(CACHE_MANAGER) private cacheManager: Cache,
+		private readonly userService: UserService,
+		@Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
 	) {}
 
 	@Get()
 	@UseGuards(AuthGuard)
 	@UseInterceptors(CacheInterceptor)
 	async getAllUsers() {
-		const usersList = await this.userService.getAllUsers();
+		const users = await this.userService.getAllUsers();
+		await this.cacheManager.set("users", users);
 
-		await this.cacheManager.set("users", usersList);
-
-		return usersList.map((user) => {
-			return new listUserDTO(user.id, user.name, user.role);
-		});
+		return users.map((user) => new listUserDTO(user.id, user.name, user.role));
 	}
 
 	@Get("/:id")
@@ -47,7 +44,6 @@ export class UserController {
 
 		if (!user) {
 			user = await this.userService.getUserWithSales(id);
-
 			await this.cacheManager.set(id, user);
 		}
 
@@ -67,7 +63,7 @@ export class UserController {
 			password: hashedPassword,
 		});
 
-		await this.cacheManager.del(newUser.id);
+		await this.cacheManager.del("users");
 
 		return {
 			message: "Usuário criado com sucesso",
@@ -80,7 +76,10 @@ export class UserController {
 	async updateUser(@Param("id") id: string, @Body() userData: UpdateUserDTO) {
 		const updatedUser = await this.userService.updateUser(id, userData);
 
-		await this.cacheManager.del(id);
+		await Promise.all([
+			this.cacheManager.del(id),
+			this.cacheManager.del("users"),
+		]);
 
 		return {
 			message: "Usuário atualizado com sucesso",
@@ -95,13 +94,16 @@ export class UserController {
 
 	@Delete("/:id")
 	async deleteUser(@Param("id") id: string) {
-		await this.userService.deleteUser(id);
+		const deletedUser = await this.userService.deleteUser(id);
 
-		await this.cacheManager.del(id);
+		await Promise.all([
+			this.cacheManager.del(id),
+			this.cacheManager.del("users"),
+		]);
 
 		return {
 			message: "Usuário deletado com sucesso",
-			user: id,
+			user: deletedUser.name,
 		};
 	}
 }

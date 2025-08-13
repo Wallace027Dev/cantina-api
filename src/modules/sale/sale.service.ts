@@ -19,59 +19,63 @@ export class SaleService {
 		private readonly userService: UserService,
 	) {}
 
+	private saleRelations = ["user", "dailyProduct", "dailyProduct.product"];
+
+	private saleSelect = {
+		id: true,
+		quantitySold: true,
+		createdAt: true,
+		user: { id: true, name: true },
+		dailyProduct: {
+			id: true,
+			product: { id: true, name: true, price: true },
+		},
+	};
+
 	async getAllSales() {
-		return await this.saleRepository.find({
-			relations: ["user", "dailyProduct", "dailyProduct.product"],
+		return this.saleRepository.find({
+			relations: this.saleRelations,
+			select: this.saleSelect,
+		});
+	}
+
+	async getSalesByUserId(userId: string) {
+		return this.saleRepository.find({
+			where: { user: { id: userId } },
+			relations: this.saleRelations.filter((r) => r !== "user"),
 			select: {
-				id: true,
-				quantitySold: true,
-				createdAt: true,
-				user: {
-					id: true,
-					name: true,
-				},
-				dailyProduct: {
-					id: true,
-					product: {
-						id: true,
-						name: true,
-						price: true,
-					},
-				},
+				...this.saleSelect,
+				user: undefined,
 			},
 		});
 	}
 
-	async createSale(data: CreateSaleDTO) {
-		// Verifica se o produto do dia existe e se tem quantidade suficiente
+	async createSale(userId: string, data: CreateSaleDTO) {
 		const dailyProduct = await this.dailyProductService.searchDailyProductById(
 			data.dailyProductId,
 		);
+
 		if (dailyProduct.quantity < data.quantitySold) {
 			throw new BadRequestException("Quantidade insuficiente em estoque");
 		}
 
-		// Verifica se o usuário existe
-		const user = await this.userService.getUserById(data.userId);
+		const user = await this.userService.getUserById(userId);
 		if (!user) {
 			throw new NotFoundException("Usuário não encontrado");
 		}
 
-		// Atualiza estoque
 		dailyProduct.quantity -= data.quantitySold;
 		await this.dailyProductService.updateDailyProduct(
 			dailyProduct.id,
 			dailyProduct,
 		);
 
-		// Cria a venda
-		const saleEntity = new SaleEntity();
-		saleEntity.user = user;
-		saleEntity.dailyProduct = dailyProduct;
-		saleEntity.quantitySold = data.quantitySold;
+		const saleEntity = this.saleRepository.create({
+			user,
+			dailyProduct,
+			quantitySold: data.quantitySold,
+		});
 
-		const createdSale = await this.saleRepository.save(saleEntity);
-
-		return createdSale;
+		return this.saleRepository.save(saleEntity);
 	}
 }

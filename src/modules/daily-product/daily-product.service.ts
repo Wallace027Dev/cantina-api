@@ -42,7 +42,23 @@ export class DailyProductService {
 	}
 
 	async searchDailyProductById(id: string) {
-		const dailyProduct = await this.dailyProductRepository.findOneBy({ id });
+		const dailyProduct = await this.dailyProductRepository.findOne({
+			where: { id },
+			relations: ["product", "day"],
+			select: {
+				id: true,
+				quantity: true,
+				product: {
+					id: true,
+					name: true,
+					price: true,
+				},
+				day: {
+					id: true,
+					date: true,
+				},
+			},
+		});
 
 		if (dailyProduct === null) {
 			throw new NotFoundException("Produto do dia não encontrado.");

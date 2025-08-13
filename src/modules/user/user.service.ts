@@ -12,70 +12,57 @@ export class UserService {
 		private readonly userRepository: Repository<UserEntity>,
 	) {}
 
-	async getAllUsers() {
-		const users = await this.userRepository.find();
-
-		return users;
+	async getAllUsers(): Promise<UserEntity[]> {
+		return this.userRepository.find();
 	}
 
-	async getUserById(id: string) {
+	async getUserById(id: string): Promise<UserEntity> {
 		const user = await this.userRepository.findOne({
 			where: { id },
-			select: {
-				id: true,
-				name: true,
-				role: true,
-			},
+			select: { id: true, name: true, role: true },
 		});
 
-		if (user === null) {
-			throw new NotFoundException("Usuário não encontrado.");
-		}
-
+		if (!user) throw new NotFoundException("Usuário não encontrado.");
 		return user;
 	}
 
-	async getUserWithSales(id: string) {
+	async getUserWithSales(id: string): Promise<UserEntity> {
 		const user = await this.userRepository.findOne({
 			where: { id },
 			relations: ["sales"],
 		});
 
-		if (user === null) {
-			throw new NotFoundException("Usuário não encontrado.");
-		}
-
+		if (!user) throw new NotFoundException("Usuário não encontrado.");
 		return user;
 	}
 
-	async searchByName(name: string) {
-		return await this.userRepository.findOne({ where: { name } });
+	async searchByName(name: string): Promise<UserEntity | null> {
+		return this.userRepository.findOne({ where: { name } });
 	}
 
-	async createUser(data: CreateUserDTO) {
-		const userEntity = new UserEntity();
-
-		Object.assign(userEntity, {
+	async createUser(data: CreateUserDTO): Promise<UserEntity> {
+		const userEntity = this.userRepository.create({
 			...data,
 			sales: [],
 		});
 
-		const user = await this.userRepository.save(userEntity);
-
-		return user;
+		return this.userRepository.save(userEntity);
 	}
 
-	async updateUser(id: string, dataForUpdate: UpdateUserDTO) {
+	async updateUser(
+		id: string,
+		dataForUpdate: UpdateUserDTO,
+	): Promise<UserEntity> {
 		const user = await this.getUserById(id);
+		Object.assign(user, dataForUpdate);
 
-		Object.assign(user, dataForUpdate as UserEntity);
-
-		await this.userRepository.save(user);
-
-		return user;
+		return this.userRepository.save(user);
 	}
 
-	async deleteUser(id: string) {
+	async deleteUser(id: string): Promise<UserEntity> {
+		const user = await this.getUserById(id);
 		await this.userRepository.delete(id);
+
+		return user;
 	}
 }

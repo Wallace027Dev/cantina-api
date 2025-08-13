@@ -8,12 +8,14 @@ import {
 	Param,
 	Post,
 	Put,
+	UseGuards,
 	UseInterceptors,
 } from "@nestjs/common";
 import { EventDayService } from "./event-day.service";
 import { CreateEventDayDTO } from "./dto/CreateEventDay.dto";
 import { UpdateEventDayDTO } from "./dto/UpdateEventDay.dto";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
+import { AuthGuard } from "../auth/auth.guard";
 
 @Controller("/event-days")
 export class EventDayController {
@@ -33,6 +35,7 @@ export class EventDayController {
 	}
 
 	@Post()
+	@UseGuards(AuthGuard)
 	async createEvent(@Body() eventData: CreateEventDayDTO) {
 		const event = await this.eventDayService.createEventDay(eventData);
 
@@ -42,6 +45,7 @@ export class EventDayController {
 	}
 
 	@Put("/:id")
+	@UseGuards(AuthGuard)
 	async updateEvent(@Param("id") id: string, @Body() data: UpdateEventDayDTO) {
 		const updatedEvent = await this.eventDayService.updateEventDay(id, data);
 
@@ -51,6 +55,7 @@ export class EventDayController {
 	}
 
 	@Delete("/:id")
+	@UseGuards(AuthGuard)
 	async deleteEvent(@Param("id") id: string) {
 		const removedEvent = await this.eventDayService.deleteEventDay(id);
 

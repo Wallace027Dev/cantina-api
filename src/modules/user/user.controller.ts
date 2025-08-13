@@ -8,6 +8,7 @@ import {
 	Param,
 	Post,
 	Put,
+	UseGuards,
 	UseInterceptors,
 } from "@nestjs/common";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
@@ -17,6 +18,7 @@ import { UserService } from "./user.service";
 import { listUserDTO } from "./dto/ListUser.dto";
 import { UserEntity } from "./user.entity";
 import { HashPasswordPipe } from "../../resources/pipes/hash-password.pipe";
+import { AuthGuard } from "../auth/auth.guard";
 
 @Controller("/users")
 export class UserController {
@@ -26,6 +28,7 @@ export class UserController {
 	) {}
 
 	@Get()
+	@UseGuards(AuthGuard)
 	@UseInterceptors(CacheInterceptor)
 	async getAllUsers() {
 		const usersList = await this.userService.getAllUsers();
@@ -38,6 +41,7 @@ export class UserController {
 	}
 
 	@Get("/:id")
+	@UseGuards(AuthGuard)
 	async getUserWithSales(@Param("id") id: string) {
 		let user = await this.cacheManager.get<UserEntity>(id);
 
@@ -72,6 +76,7 @@ export class UserController {
 	}
 
 	@Put("/:id")
+	@UseGuards(AuthGuard)
 	async updateUser(@Param("id") id: string, @Body() userData: UpdateUserDTO) {
 		const updatedUser = await this.userService.updateUser(id, userData);
 

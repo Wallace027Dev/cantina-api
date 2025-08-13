@@ -5,12 +5,15 @@ import {
 	Get,
 	Inject,
 	Post,
+	UseGuards,
 	UseInterceptors,
 } from "@nestjs/common";
 import { CreateSaleDTO } from "./dto/CreateSale.dto";
 import { SaleService } from "./sale.service";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
+import { AuthGuard } from "../auth/auth.guard";
 
+@UseGuards(AuthGuard)
 @Controller("/sales")
 export class SaleController {
 	constructor(

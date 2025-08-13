@@ -7,12 +7,14 @@ import {
 	Param,
 	Post,
 	Put,
+	UseGuards,
 	UseInterceptors,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDTO } from "./dto/CreateProduct.dto";
 import { UpdateProductDTO } from "./dto/UpdateProduct.dto";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
+import { AuthGuard } from "../auth/auth.guard";
 
 @Controller("/products")
 export class ProductController {
@@ -31,6 +33,7 @@ export class ProductController {
 		return products;
 	}
 
+	@UseGuards(AuthGuard)
 	@Post()
 	async createProduct(@Body() productData: CreateProductDTO) {
 		const newProduct = await this.productService.createProduct(productData);
@@ -43,6 +46,7 @@ export class ProductController {
 		};
 	}
 
+	@UseGuards(AuthGuard)
 	@Put("/:id")
 	async updateProduct(
 		@Param("id") id: string,

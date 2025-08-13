@@ -8,12 +8,14 @@ import {
 	Param,
 	Post,
 	Put,
+	UseGuards,
 	UseInterceptors,
 } from "@nestjs/common";
 import { CreateDailyProductDTO } from "./dto/CreateDailyProduct.dto";
 import { UpdateDailyProductDTO } from "./dto/UpdateDailyProduct.dto";
 import { DailyProductService } from "./daily-product.service";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
+import { AuthGuard } from "../auth/auth.guard";
 
 @Controller("daily-products")
 export class DailyProductController {
@@ -33,6 +35,7 @@ export class DailyProductController {
 	}
 
 	@Post()
+	@UseGuards(AuthGuard)
 	async createDailyProduct(@Body() data: CreateDailyProductDTO) {
 		const dp = await this.dailyProductService.createDailyProduct(data);
 
@@ -45,6 +48,7 @@ export class DailyProductController {
 	}
 
 	@Put("/:id")
+	@UseGuards(AuthGuard)
 	async updateDailyProduct(
 		@Param("id") id: string,
 		@Body() data: UpdateDailyProductDTO,
@@ -63,6 +67,7 @@ export class DailyProductController {
 	}
 
 	@Delete("/:id")
+	@UseGuards(AuthGuard)
 	async deleteDailyProduct(@Param("id") id: string) {
 		const dp = await this.dailyProductService.deleteDailyProduct(id);
 

@@ -83,8 +83,7 @@ findAll() {
 ### **Auth**
 | Método | Rota         | Descrição            |
 |--------|-------------|----------------------|
-| POST   | `/auth/login` | Login de usuário     |
-| POST   | `/auth/signup` | Registro de usuário |
+| POST   | `/auth` | Login de usuário     |
 
 ### **Usuários**
 | Método | Rota          | Descrição                 |
